@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boşmatik - Günlük Boş Yapma Takipçisi</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4ecdc4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Boşmatik">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    
+    <!-- Splash Screen -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Boşmatik</h1>
+            <p>Günlük boş yapma seviyeni keşfet ve arkadaşlarınla yarış!</p>
+            <div class="user-stats">
+                <div class="stat">
+                    <span class="stat-label">Seviye</span>
+                    <span class="stat-value" id="userLevel">1</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Toplam Puan</span>
+                    <span class="stat-value" id="totalPoints">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Günlük Seri</span>
+                    <span class="stat-value" id="dailyStreak">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <h2>📱 Bugün Ne Kadar Boş Yaptın?</h2>
+                
+                <!-- Usage Import Modal -->
+                <div class="usage-modal" id="usageModal">
+                    <div class="usage-modal-content">
+                        <h3>📊 Kullanım Verilerini İçe Aktar</h3>
+                        <p>Android telefonda: Ayarlar → Dijital Sağlık ve Ebeveyn Denetimleri → verilerini kopyalayıp buraya yapıştır:</p>
+                        <textarea class="usage-input-area" id="usageInput" placeholder="Örnek:
+Instagram: 2s 30dk
+TikTok: 1s 45dk  
+YouTube: 3s 15dk
+Twitter: 45dk
+Twitch: 2s 15dk
+Discord: 1s 30dk
+WhatsApp: 45dk"></textarea>
+                        <div class="modal-buttons">
+                            <button class="modal-btn primary" onclick="parseUsageData()">📥 Verileri Al</button>
+                            <button class="modal-btn secondary" onclick="closeUsageModal()">❌ İptal</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="activity-group social-media">
+                    <h3>🔥 Sosyal Medya & Eğlence</h3>
+                    <div class="auto-import-section">
+                        <button id="importUsage" class="import-btn">� Kullanım Verilerini İçe Aktar</button>
+                        <p class="import-help">Android: Ayarlar → Dijital Sağlık → Uygulama sürelerini kopyala</p>
+                    </div>
+                    <div class="input-row">
+                        <label for="instagram">📸 Instagram:</label>
+                        <input type="number" id="instagram" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('instagram', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="tiktok">🎵 TikTok:</label>
+                        <input type="number" id="tiktok" min="0" max="24" value="0" step="0.25">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('tiktok', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="youtube">� YouTube:</label>
+                        <input type="number" id="youtube" min="0" max="24" value="0" step="0.25">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('youtube', 1)">+1sa</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="twitter">🐦 Twitter/X:</label>
+                        <input type="number" id="twitter" min="0" max="24" value="0" step="0.25">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('twitter', 0.25)">+15dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="facebook">👥 Facebook:</label>
+                        <input type="number" id="facebook" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('facebook', 0.25)">+15dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="twitch">🎮 Twitch:</label>
+                        <input type="number" id="twitch" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('twitch', 1)">+1sa</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="discord">💬 Discord:</label>
+                        <input type="number" id="discord" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('discord', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="snapchat">👻 Snapchat:</label>
+                        <input type="number" id="snapchat" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('snapchat', 0.25)">+15dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="linkedin">💼 LinkedIn:</label>
+                        <input type="number" id="linkedin" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('linkedin', 0.25)">+15dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="reddit">🤖 Reddit:</label>
+                        <input type="number" id="reddit" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('reddit', 0.5)">+30dk</button>
+                    </div>
+                </div>
+
+                <div class="activity-group entertainment">
+                    <h3>🎯 Diğer Boş Aktiviteler</h3>
+                    <div class="input-row">
+                        <label for="netflix">🍿 Netflix/Dizi:</label>
+                        <input type="number" id="netflix" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('netflix', 1)">+1sa</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="games">🎮 Oyun:</label>
+                        <input type="number" id="games" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('games', 1)">+1sa</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="spotify">🎵 Spotify/Müzik:</label>
+                        <input type="number" id="spotify" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('spotify', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="random">🤷‍♂️ Rastgele Gezinme:</label>
+                        <input type="number" id="random" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('random', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="shopping">🛒 Online Alışveriş:</label>
+                        <input type="number" id="shopping" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('shopping', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="whatsapp">📱 WhatsApp:</label>
+                        <input type="number" id="whatsapp" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('whatsapp', 0.25)">+15dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="telegram">✈️ Telegram:</label>
+                        <input type="number" id="telegram" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add" onclick="quickAdd('telegram', 0.25)">+15dk</button>
+                    </div>
+                </div>
+
+                <div class="activity-group productive">
+                    <h3>💪 Üretken Aktiviteler (Puan Azaltır)</h3>
+                    <div class="input-row">
+                        <label for="reading">📚 Kitap Okuma:</label>
+                        <input type="number" id="reading" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add productive" onclick="quickAdd('reading', 0.5)">+30dk</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="exercise">🏃‍♂️ Spor:</label>
+                        <input type="number" id="exercise" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add productive" onclick="quickAdd('exercise', 1)">+1sa</button>
+                    </div>
+                    <div class="input-row">
+                        <label for="learning">🎓 Öğrenme/Kurs:</label>
+                        <input type="number" id="learning" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
+                        <span>saat</span>
+                        <button class="quick-add productive" onclick="quickAdd('learning', 1)">+1sa</button>
+                    </div>
+                </div>
+
+                <button id="calculate" class="calculate-btn inline-style">
+                    <div class="btn-content">
+                        <span class="btn-icon">🎯</span>
+                        <span class="btn-text">Boş Yapma Seviyemi Hesapla!</span>
+                        <div class="btn-ripple"></div>
+                    </div>
+                </button>
+
+                <!-- Alternative: Sticky Bottom Bar -->
+                <div class="bottom-action-bar" id="bottomBar" style="display: none;">
+                    <div class="action-buttons">
+                        <button class="action-btn secondary" onclick="clearAllInputs()">
+                            <span>🗑️</span>
+                            <span>Temizle</span>
+                        </button>
+                        <button class="action-btn primary" onclick="window.bosmatikApp.calculateBoşYapma()">
+                            <span>🎯</span>
+                            <span>Hesapla</span>
+                        </button>
+                        <button class="action-btn secondary" onclick="toggleImportModal()">
+                            <span>📊</span>
+                            <span>İçe Aktar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manual Reset Button -->
+                <div class="manual-reset-container">
+                    <button onclick="manualReset()" class="reset-btn-inline">� Yeni Gün Başlat</button>
+                </div>
+            </div>
+
+            <div class="result-section" id="results" style="display: none;">
+                <div class="achievement-popup" id="achievementPopup" style="display: none;">
+                    <div class="achievement-content">
+                        <h3>🏆 Yeni Başarı!</h3>
+                        <p id="achievementText"></p>
+                        <button onclick="closeAchievement()">Tamam</button>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="boş-level">
+                        <span class="label">Bugünkü Boş Yapma Seviyesi:</span>
+                        <div class="level-display">
+                            <span class="level-emoji" id="levelEmoji">😴</span>
+                            <span class="level-name" id="levelName">Başlangıç</span>
+                        </div>
+                        <div class="points-earned">
+                            <span class="points" id="pointsEarned">+0</span>
+                            <span class="points-label">Boş Puan</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="breakdown">
+                    <h3>📊 Boş Yapma Analizi</h3>
+                    <div class="chart" id="timeChart"></div>
+                </div>
+
+                <div class="leaderboard">
+                    <h3>🏆 Günlük Sıralama</h3>
+                    <div class="leaderboard-list" id="leaderboardList"></div>
+                </div>
+
+                <div class="achievements">
+                    <h3>🎖️ Başarılar</h3>
+                    <div class="achievement-grid" id="achievementGrid"></div>
+                </div>
+
+                <div class="tips">
+                    <h3>💡 Boş Yapma İpuçları</h3>
+                    <div class="tip-card" id="dailyTip"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
