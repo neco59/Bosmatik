@@ -1249,3 +1249,21 @@ observer.observe(document.body, {
 });
 
 console.log('🛡️ Import engelleyici aktif!');
+// Dil seçici butonlarını güncelle
+function updateLanguageButtons() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const activeBtn = document.getElementById(`lang-${currentLanguage}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+}
+
+// Sayfa yüklendiğinde dil butonlarını güncelle
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        updateLanguageButtons();
+    }, 100);
+});
