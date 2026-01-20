@@ -27,6 +27,10 @@
 <body>
     <div class="container">
         <header>
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
+                <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
+            </div>
             <h1>🎮 Boşmatik</h1>
             <p>Günlük boş yapma seviyeni keşfet ve arkadaşlarınla yarış!</p>
             <div class="user-stats">
@@ -49,32 +53,10 @@
             <div class="input-section">
                 <h2>📱 Bugün Ne Kadar Boş Yaptın?</h2>
                 
-                <!-- Usage Import Modal -->
-                <div class="usage-modal" id="usageModal">
-                    <div class="usage-modal-content">
-                        <h3>📊 Kullanım Verilerini İçe Aktar</h3>
-                        <p>Android telefonda: Ayarlar → Dijital Sağlık ve Ebeveyn Denetimleri → verilerini kopyalayıp buraya yapıştır:</p>
-                        <textarea class="usage-input-area" id="usageInput" placeholder="Örnek:
-Instagram: 2s 30dk
-TikTok: 1s 45dk  
-YouTube: 3s 15dk
-Twitter: 45dk
-Twitch: 2s 15dk
-Discord: 1s 30dk
-WhatsApp: 45dk"></textarea>
-                        <div class="modal-buttons">
-                            <button class="modal-btn primary" onclick="parseUsageData()">📥 Verileri Al</button>
-                            <button class="modal-btn secondary" onclick="closeUsageModal()">❌ İptal</button>
-                        </div>
-                    </div>
-                </div>
+
                 
                 <div class="activity-group social-media">
                     <h3>🔥 Sosyal Medya & Eğlence</h3>
-                    <div class="auto-import-section">
-                        <button id="importUsage" class="import-btn">� Kullanım Verilerini İçe Aktar</button>
-                        <p class="import-help">Android: Ayarlar → Dijital Sağlık → Uygulama sürelerini kopyala</p>
-                    </div>
                     <div class="input-row">
                         <label for="instagram">📸 Instagram:</label>
                         <input type="number" id="instagram" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
@@ -83,19 +65,19 @@ WhatsApp: 45dk"></textarea>
                     </div>
                     <div class="input-row">
                         <label for="tiktok">🎵 TikTok:</label>
-                        <input type="number" id="tiktok" min="0" max="24" value="0" step="0.25">
+                        <input type="number" id="tiktok" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
                         <span>saat</span>
                         <button class="quick-add" onclick="quickAdd('tiktok', 0.5)">+30dk</button>
                     </div>
                     <div class="input-row">
                         <label for="youtube">� YouTube:</label>
-                        <input type="number" id="youtube" min="0" max="24" value="0" step="0.25">
+                        <input type="number" id="youtube" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
                         <span>saat</span>
                         <button class="quick-add" onclick="quickAdd('youtube', 1)">+1sa</button>
                     </div>
                     <div class="input-row">
                         <label for="twitter">🐦 Twitter/X:</label>
-                        <input type="number" id="twitter" min="0" max="24" value="0" step="0.25">
+                        <input type="number" id="twitter" min="0" max="24" value="0" step="0.25" placeholder="0" oninput="if(this.value>24)this.value=24;if(this.value<0)this.value=0;">
                         <span>saat</span>
                         <button class="quick-add" onclick="quickAdd('twitter', 0.25)">+15dk</button>
                     </div>
@@ -224,10 +206,6 @@ WhatsApp: 45dk"></textarea>
                             <span>🎯</span>
                             <span>Hesapla</span>
                         </button>
-                        <button class="action-btn secondary" onclick="toggleImportModal()">
-                            <span>📊</span>
-                            <span>İçe Aktar</span>
-                        </button>
                     </div>
                 </div>
 
@@ -283,6 +261,7 @@ WhatsApp: 45dk"></textarea>
         </main>
     </div>
 
+    <script src="translations.js"></script>
     <script src="script.js"></script>
     
     <!-- PWA Service Worker -->
