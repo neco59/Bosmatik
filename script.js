@@ -726,6 +726,9 @@ class Bosmatik {
                 allAchievements[category].forEach(achievement => {
                     const isUnlocked = this.userData.unlockedAchievements[category].includes(achievement.id);
                     
+                    // Çeviri sisteminden başarı bilgilerini al
+                    const achievementData = t(`achievements.${achievement.id}`) || { name: achievement.name, desc: achievement.desc };
+                    
                     const item = document.createElement('div');
                     item.className = `achievement-item ${isUnlocked ? 'unlocked' : ''}`;
                     
@@ -736,8 +739,8 @@ class Bosmatik {
                     
                     item.innerHTML = `
                         <span class="achievement-emoji">${isUnlocked ? achievement.emoji : '🔒'}</span>
-                        <div class="achievement-name">${achievement.name}</div>
-                        <div class="achievement-desc">${achievement.desc}</div>
+                        <div class="achievement-name">${achievementData.name}</div>
+                        <div class="achievement-desc">${achievementData.desc}</div>
                         ${isUnlocked ? `<div class="achievement-bonus">+${this.getCategoryBonus(category)} puan</div>` : ''}
                     `;
                     
@@ -811,21 +814,18 @@ class Bosmatik {
     }
 
     generateDailyTip() {
-        const tips = [
+        const tips = t('tips') || [
             "TikTok'ta 'sadece 5 dakika' diyerek başlayıp 3 saat geçirmek boş yapma sanatının zirvesidir! 🎭",
-            "Instagram'da arkadaşının arkadaşının tatil fotoğraflarına bakmak da boş yapma puanı kazandırır! 📸",
-            "YouTube'da 'nasıl üretken olunur' videoları izlemek ironik bir boş yapma aktivitesidir! 🤔",
-            "Online alışverişte sepete ekleyip almamak da bir boş yapma türüdür! 🛒",
-            "Sosyal medyada eski sevgilinin profilini stalklama = ekstra boş puan! 🕵️‍♂️",
-            "Netflix'te 30 dakika film seçmek, filmi izlemekten daha uzun sürebilir! 🎬",
-            "Telefonda oyun oynarken 'sadece bu level' demek ünlü son sözlerdendir! 🎮",
-            "Rastgele internet gezintisi sırasında nasıl buraya geldiğini unutmak normaldır! 🌐"
+            "Instagram'da arkadaşının arkadaşının tatil fotoğraflarına bakmak da boş yapma puanı kazandırır! 📸"
         ];
         
         const randomTip = tips[Math.floor(Math.random() * tips.length)];
-        document.getElementById('dailyTip').innerHTML = `
-            <div class="tip-text">${randomTip}</div>
-        `;
+        const tipElement = document.getElementById('dailyTip');
+        if (tipElement) {
+            tipElement.innerHTML = `
+                <div class="tip-text">${randomTip}</div>
+            `;
+        }
     }
 
 
