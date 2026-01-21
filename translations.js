@@ -47,6 +47,7 @@ const translations = {
         clearBtn: "Temizle",
         calculateBtnShort: "Hesapla",
         themeToggle: "Tema Değiştir",
+        okBtn: "Tamam",
         
         // Results
         todayLevel: "Bugünkü Boş Yapma Seviyesi:",
@@ -61,6 +62,14 @@ const translations = {
         weeklyAchievements: "🔥 Haftalık", 
         monthlyAchievements: "🏆 Aylık",
         yearlyAchievements: "🌟 Yıllık",
+        
+        // Achievement Category Names (for dynamic display)
+        categoryNames: {
+            daily: "🌅 Günlük",
+            weekly: "🔥 Haftalık", 
+            monthly: "🏆 Aylık",
+            yearly: "🌟 Yıllık"
+        },
         
         // Levels
         levels: {
@@ -80,6 +89,9 @@ const translations = {
         maxHoursReached: "⚠️ Maksimum 24 saat sınırına ulaşıldı!",
         productiveAdded: "✨ Harika! Üretken aktivite eklendi! 💪",
         newDayConfirm: "🔄 Yeni güne başlamak için tüm günlük verileri sıfırlamak istiyor musun?",
+        newAchievement: "🏆 Yeni Başarı!",
+        achievementUnlocked: "Başarı Kilidi Açıldı!",
+        bonusPoints: "Bonus Puan",
         
         // Achievements
         achievements: {
@@ -172,6 +184,7 @@ const translations = {
         clearBtn: "Clear",
         calculateBtnShort: "Calculate",
         themeToggle: "Toggle Theme",
+        okBtn: "OK",
         
         // Results
         todayLevel: "Today's Time-Wasting Level:",
@@ -186,6 +199,14 @@ const translations = {
         weeklyAchievements: "🔥 Weekly",
         monthlyAchievements: "🏆 Monthly", 
         yearlyAchievements: "🌟 Yearly",
+        
+        // Achievement Category Names (for dynamic display)
+        categoryNames: {
+            daily: "🌅 Daily",
+            weekly: "🔥 Weekly",
+            monthly: "🏆 Monthly", 
+            yearly: "🌟 Yearly"
+        },
         
         // Levels
         levels: {
@@ -205,6 +226,9 @@ const translations = {
         maxHoursReached: "⚠️ Maximum 24 hours limit reached!",
         productiveAdded: "✨ Great! Productive activity added! 💪",
         newDayConfirm: "🔄 Do you want to reset all daily data to start a new day?",
+        newAchievement: "🏆 New Achievement!",
+        achievementUnlocked: "Achievement Unlocked!",
+        bonusPoints: "Bonus Points",
         
         // Achievements
         achievements: {
@@ -347,6 +371,17 @@ function updatePageTexts() {
             element.textContent = t(key);
         }
     });
+    
+    // Achievement popup
+    const achievementTitle = document.getElementById('achievementTitle');
+    if (achievementTitle) {
+        achievementTitle.textContent = t('newAchievement');
+    }
+    
+    const achievementOkBtn = document.getElementById('achievementOkBtn');
+    if (achievementOkBtn) {
+        achievementOkBtn.textContent = t('okBtn');
+    }
 }
 
 // Sayfa yüklendiğinde dili uygula
