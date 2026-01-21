@@ -1267,3 +1267,111 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLanguageButtons();
     }, 100);
 });
+// Dark Mode Functionality
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('bosmatik-theme', newTheme);
+    
+    // Update theme toggle button
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    // Add smooth transition effect
+    document.body.style.transition = 'all 0.3s ease';
+    setTimeout(() => {
+        document.body.style.transition = '';
+    }, 300);
+}
+
+// Load saved theme
+function loadTheme() {
+    const savedTheme = localStorage.getItem('bosmatik-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+}
+
+// Initialize theme on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadTheme();
+});
+
+// Modern UI Enhancements
+function addModernAnimations() {
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.activity-group, .achievement-item, .result-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-4px)';
+            card.style.boxShadow = '0 12px 30px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '';
+        });
+    });
+    
+    // Add ripple effect to buttons
+    const buttons = document.querySelectorAll('.quick-add, .calculate-btn, .lang-btn, .theme-toggle');
+    buttons.forEach(button => {
+        button.addEventListener('click', createRipple);
+    });
+}
+
+function createRipple(event) {
+    const button = event.currentTarget;
+    const ripple = document.createElement('span');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    
+    ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple 0.6s ease-out;
+        pointer-events: none;
+    `;
+    
+    button.style.position = 'relative';
+    button.style.overflow = 'hidden';
+    button.appendChild(ripple);
+    
+    setTimeout(() => {
+        ripple.remove();
+    }, 600);
+}
+
+// Add ripple animation CSS
+const rippleCSS = `
+@keyframes ripple {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+`;
+
+const style = document.createElement('style');
+style.textContent = rippleCSS;
+document.head.appendChild(style);
+
+// Initialize modern animations
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(addModernAnimations, 500);
+});
