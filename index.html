@@ -27,6 +27,13 @@
 <body>
     <div class="container">
         <header>
+            <div class="language-selector">
+                <button class="settings-btn" onclick="openSettings()" id="settingsBtn">⚙️</button>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+                <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
+                <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
+            </div>
+
             <!-- Login Section -->
             <div id="loginSection" class="login-section" style="display: block;">
                 <div class="login-container">
@@ -47,14 +54,6 @@
 
             <!-- User Section -->
             <div id="userSection" class="user-section" style="display: none;">
-                <div class="language-selector">
-                    <button class="settings-btn" onclick="openSettings()" id="settingsBtn">⚙️</button>
-                    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
-                    <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
-                    <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
-                    <button class="logout-btn" onclick="logout()" id="logoutBtn">🚪</button>
-                </div>
-                
                 <div id="userInfo" class="user-info"></div>
                 
                 <h1>🎮 Boşmatik</h1>
@@ -72,6 +71,10 @@
                         <span class="stat-label">Günlük Seri</span>
                         <span class="stat-value" id="dailyStreak">0</span>
                     </div>
+                </div>
+                
+                <div class="user-actions">
+                    <button class="logout-btn" onclick="logout()" id="logoutBtn">🚪 Çıkış</button>
                 </div>
             </div>
         </header>
