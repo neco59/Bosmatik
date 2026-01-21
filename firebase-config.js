@@ -108,6 +108,37 @@ class FirebaseService {
         }
     }
 
+    // Update User Profile
+    async updateUserProfile(displayName, customAvatar) {
+        if (!this.currentUser) {
+            throw new Error('Kullanıcı giriş yapmamış');
+        }
+
+        try {
+            // Update profile in Firestore
+            const updatedProfile = {
+                ...this.userProfile,
+                displayName: displayName,
+                customAvatar: customAvatar,
+                updatedAt: serverTimestamp()
+            };
+
+            await setDoc(doc(db, 'users', this.currentUser.uid), updatedProfile, { merge: true });
+            
+            // Update local profile
+            this.userProfile = updatedProfile;
+            
+            // Update UI
+            this.updateUI();
+            
+            console.log('✅ Profil güncellendi:', displayName, customAvatar);
+            return true;
+        } catch (error) {
+            console.error('Profil güncelleme hatası:', error);
+            throw error;
+        }
+    }
+
     // Update User Status
     async updateUserStatus() {
         if (!this.currentUser || !this.userProfile) return;
@@ -267,11 +298,20 @@ class FirebaseService {
             if (userSection) userSection.style.display = 'block';
             
             if (userInfo) {
+                const avatar = this.userProfile.customAvatar || this.userProfile.photoURL || '👤';
+                const displayName = this.userProfile.displayName || 'Anonim Kullanıcı';
+                
                 userInfo.innerHTML = `
-                    <div class="user-profile">
-                        ${this.userProfile.photoURL ? `<img src="${this.userProfile.photoURL}" alt="Profile" class="user-avatar">` : '👤'}
+                    <div class="user-profile" onclick="openProfile()">
+                        <div class="user-avatar-container">
+                            ${this.userProfile.photoURL && !this.userProfile.customAvatar ? 
+                                `<img src="${this.userProfile.photoURL}" alt="Profile" class="user-avatar">` : 
+                                `<div class="user-avatar-emoji">${avatar}</div>`
+                            }
+                            <div class="edit-indicator">✏️</div>
+                        </div>
                         <div class="user-details">
-                            <div class="user-name">${this.userProfile.displayName}</div>
+                            <div class="user-name">${displayName}</div>
                             <div class="user-stats">Seviye ${this.userProfile.level} • ${this.userProfile.totalPoints.toLocaleString()} puan</div>
                         </div>
                     </div>
