@@ -1751,6 +1751,11 @@ function updateSoundEffects() {
 // Firebase Login Functions
 async function loginWithGoogle() {
     try {
+        if (!window.firebaseService) {
+            console.error('Firebase servisi yüklenmemiş');
+            alert('Firebase servisi yükleniyor, lütfen bekleyin...');
+            return;
+        }
         const user = await window.firebaseService.loginWithGoogle();
         console.log('Google giriş başarılı:', user.displayName);
     } catch (error) {
@@ -1761,6 +1766,11 @@ async function loginWithGoogle() {
 
 async function loginAnonymously() {
     try {
+        if (!window.firebaseService) {
+            console.error('Firebase servisi yüklenmemiş');
+            alert('Firebase servisi yükleniyor, lütfen bekleyin...');
+            return;
+        }
         const user = await window.firebaseService.loginAnonymously();
         console.log('Anonim giriş başarılı:', user.uid);
     } catch (error) {
@@ -1771,6 +1781,7 @@ async function loginAnonymously() {
 
 async function logout() {
     try {
+        if (!window.firebaseService) return;
         await window.firebaseService.logout();
     } catch (error) {
         console.error('Çıkış hatası:', error);
@@ -1879,6 +1890,11 @@ function showLeaderboardTab(tab) {
     // Show/hide content
     document.getElementById('dailyLeaderboard').style.display = tab === 'daily' ? 'block' : 'none';
     document.getElementById('alltimeLeaderboard').style.display = tab === 'alltime' ? 'block' : 'none';
+}
+
+function testNotification() {
+    if (!notificationManager) return;
+    notificationManager.testNotification();
 }
 
 // Initialize notification manager
