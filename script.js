@@ -329,25 +329,25 @@ class Bosmatik {
     getActivityData() {
         return {
             // Sosyal Medya (yüksek puan)
-            'Instagram': { time: this.getValidNumber('instagram'), multiplier: 3 },
-            'TikTok': { time: this.getValidNumber('tiktok'), multiplier: 4 },
-            'YouTube': { time: this.getValidNumber('youtube'), multiplier: 2.5 },
-            'Twitter': { time: this.getValidNumber('twitter'), multiplier: 2 },
-            'Facebook': { time: this.getValidNumber('facebook'), multiplier: 2 },
-            'Twitch': { time: this.getValidNumber('twitch'), multiplier: 2.5 },
-            'Discord': { time: this.getValidNumber('discord'), multiplier: 1.5 },
-            'Snapchat': { time: this.getValidNumber('snapchat'), multiplier: 3 },
-            'LinkedIn': { time: this.getValidNumber('linkedin'), multiplier: 1 },
-            'Reddit': { time: this.getValidNumber('reddit'), multiplier: 2.5 },
+            'Fotoğraf Paylaşım': { time: this.getValidNumber('instagram'), multiplier: 3 },
+            'Kısa Video': { time: this.getValidNumber('tiktok'), multiplier: 4 },
+            'Video İzleme': { time: this.getValidNumber('youtube'), multiplier: 2.5 },
+            'Mikroblog': { time: this.getValidNumber('twitter'), multiplier: 2 },
+            'Sosyal Ağ': { time: this.getValidNumber('facebook'), multiplier: 2 },
+            'Canlı Yayın': { time: this.getValidNumber('twitch'), multiplier: 2.5 },
+            'Sesli Sohbet': { time: this.getValidNumber('discord'), multiplier: 1.5 },
+            'Anlık Mesaj': { time: this.getValidNumber('snapchat'), multiplier: 3 },
+            'Profesyonel Ağ': { time: this.getValidNumber('linkedin'), multiplier: 1 },
+            'Forum': { time: this.getValidNumber('reddit'), multiplier: 2.5 },
             
             // Eğlence (orta puan)
-            'Netflix': { time: this.getValidNumber('netflix'), multiplier: 2 },
+            'Dizi/Film İzleme': { time: this.getValidNumber('netflix'), multiplier: 2 },
             'Oyun': { time: this.getValidNumber('games'), multiplier: 1.5 },
-            'Spotify': { time: this.getValidNumber('spotify'), multiplier: 0.5 },
+            'Müzik Dinleme': { time: this.getValidNumber('spotify'), multiplier: 0.5 },
             'Rastgele Gezinme': { time: this.getValidNumber('random'), multiplier: 3.5 },
             'Online Alışveriş': { time: this.getValidNumber('shopping'), multiplier: 2.5 },
-            'WhatsApp': { time: this.getValidNumber('whatsapp'), multiplier: 1.5 },
-            'Telegram': { time: this.getValidNumber('telegram'), multiplier: 1.5 },
+            'Anlık Mesajlaşma': { time: this.getValidNumber('whatsapp'), multiplier: 1.5 },
+            'Mesajlaşma': { time: this.getValidNumber('telegram'), multiplier: 1.5 },
             
             // Üretken aktiviteler (puan azaltır)
             'Kitap': { time: this.getValidNumber('reading'), multiplier: -1 },
@@ -481,14 +481,14 @@ class Bosmatik {
             daily: [
                 { id: 'daily_first_entry', name: 'Günlük Giriş', desc: 'Bugün ilk giriş', emoji: '🌅', condition: () => true },
                 { id: 'daily_social_limit', name: 'Sosyal Medya Kontrolü', desc: 'Sosyal medyada 3 saatten az', emoji: '📱', condition: (score, activities) => {
-                    const socialTime = (activities.Instagram?.time || 0) + (activities.TikTok?.time || 0) + 
-                                     (activities.Twitter?.time || 0) + (activities.Facebook?.time || 0) + 
-                                     (activities.Snapchat?.time || 0) + (activities.Reddit?.time || 0);
+                    const socialTime = (activities['Fotoğraf Paylaşım']?.time || 0) + (activities['Kısa Video']?.time || 0) + 
+                                     (activities['Mikroblog']?.time || 0) + (activities['Sosyal Ağ']?.time || 0) + 
+                                     (activities['Anlık Mesaj']?.time || 0) + (activities['Forum']?.time || 0);
                     return socialTime < 3;
                 }},
                 { id: 'daily_entertainment_limit', name: 'Eğlence Dengesi', desc: 'Eğlence aktivitelerinde 2.5 saatten az', emoji: '🎯', condition: (score, activities) => {
-                    const entertainmentTime = (activities.Netflix?.time || 0) + (activities.Oyun?.time || 0) + 
-                                            (activities.Twitch?.time || 0) + (activities.Discord?.time || 0);
+                    const entertainmentTime = (activities['Dizi/Film İzleme']?.time || 0) + (activities.Oyun?.time || 0) + 
+                                            (activities['Canlı Yayın']?.time || 0) + (activities['Sesli Sohbet']?.time || 0);
                     return entertainmentTime < 2.5;
                 }},
                 { id: 'daily_productive_goal', name: 'Günlük Üretkenlik', desc: '2+ saat üretken aktivite', emoji: '💪', condition: (score, activities) => {
@@ -514,13 +514,13 @@ class Bosmatik {
             weekly: [
                 { id: 'week_streak', name: 'Haftalık Seri', desc: '7 gün üst üste giriş', emoji: '🔥', condition: () => this.userData.dailyStreak >= 7 },
                 { id: 'week_social_master', name: 'Sosyal Medya Ustası', desc: '8+ saat sosyal medya (haftalık)', emoji: '📱', condition: (score, activities) => {
-                    const socialTime = (activities.Instagram?.time || 0) + (activities.TikTok?.time || 0) + 
-                                     (activities.Twitter?.time || 0) + (activities.Facebook?.time || 0) + 
-                                     (activities.Snapchat?.time || 0) + (activities.Reddit?.time || 0);
+                    const socialTime = (activities['Fotoğraf Paylaşım']?.time || 0) + (activities['Kısa Video']?.time || 0) + 
+                                     (activities['Mikroblog']?.time || 0) + (activities['Sosyal Ağ']?.time || 0) + 
+                                     (activities['Anlık Mesaj']?.time || 0) + (activities['Forum']?.time || 0);
                     return socialTime >= 8;
                 }},
-                { id: 'week_tiktok_addict', name: 'TikTok Bağımlısı', desc: '5+ saat TikTok', emoji: '🎵', condition: (score, activities) => activities.TikTok?.time >= 5 },
-                { id: 'week_netflix_binge', name: 'Dizi Maratoncusu', desc: '6+ saat Netflix', emoji: '🍿', condition: (score, activities) => activities.Netflix?.time >= 6 },
+                { id: 'week_tiktok_addict', name: 'Kısa Video Bağımlısı', desc: '5+ saat kısa video', emoji: '🎵', condition: (score, activities) => activities['Kısa Video']?.time >= 5 },
+                { id: 'week_netflix_binge', name: 'Dizi Maratoncusu', desc: '6+ saat dizi/film', emoji: '🍿', condition: (score, activities) => activities['Dizi/Film İzleme']?.time >= 6 },
                 { id: 'week_gamer', name: 'Oyun Tutkunu', desc: '8+ saat oyun', emoji: '🎮', condition: (score, activities) => activities.Oyun?.time >= 8 },
                 { id: 'week_bookworm', name: 'Kitap Kurdu', desc: '10+ saat kitap okuma', emoji: '📚', condition: (score, activities) => activities.Kitap?.time >= 10 },
                 { id: 'week_athlete', name: 'Sporcu Ruhu', desc: '8+ saat spor', emoji: '🏃‍♂️', condition: (score, activities) => activities.Spor?.time >= 8 }
