@@ -405,16 +405,19 @@
 
     <script src="translations.js"></script>
     
-    <!-- Firebase SDK v9 Compat -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase SDK v8 (More Stable) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <script src="firebase-config.js"></script>
     <script src="script.js"></script>
     
-    <!-- PWA Service Worker -->
+    <!-- PWA Service Worker - Temporarily Disabled -->
     <script>
+        // ServiceWorker temporarily disabled for debugging
+        console.log('ServiceWorker kaydı devre dışı bırakıldı');
+        /*
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
@@ -426,6 +429,7 @@
                     });
             });
         }
+        */
     </script>
 </body>
 </html>
