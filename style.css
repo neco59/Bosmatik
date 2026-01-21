@@ -1542,3 +1542,230 @@ main {
 header {
     position: relative;
 }
+/* Dark Mode Variables */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7fafc;
+    --bg-card: #ffffff;
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --border-color: #e2e8f0;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --gradient-primary: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+    --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --bg-card: #2d3748;
+    --text-primary: #f7fafc;
+    --text-secondary: #e2e8f0;
+    --text-muted: #a0aec0;
+    --border-color: #4a5568;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --gradient-primary: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+    --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    margin-right: 10px;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Updated Body and Main Styles */
+body {
+    background: var(--gradient-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+main {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 15px 35px var(--shadow);
+}
+
+/* Activity Groups */
+.activity-group {
+    background: var(--bg-secondary);
+    border-left: 4px solid #667eea;
+}
+
+.social-media {
+    background: var(--bg-secondary);
+    border: 2px solid #ff6b6b;
+}
+
+.entertainment {
+    background: var(--bg-secondary);
+    border: 2px solid #667eea;
+}
+
+.productive {
+    background: var(--bg-secondary);
+    border: 2px solid #48bb78;
+}
+
+/* Input Rows */
+.input-row {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.input-row label {
+    color: var(--text-primary);
+}
+
+.input-row input {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.input-row input:focus {
+    border-color: #4ecdc4;
+    background: var(--bg-card);
+}
+
+.input-row span {
+    color: var(--text-muted);
+}
+
+/* Activity Group Titles */
+.activity-group h3 {
+    color: var(--text-primary);
+}
+
+/* Results Section */
+.breakdown, .leaderboard, .achievements, .tips {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.breakdown h3, .leaderboard h3, .achievements h3, .tips h3 {
+    color: var(--text-primary);
+}
+
+/* Chart */
+.chart {
+    background: var(--bg-card);
+}
+
+.chart-bar {
+    background: var(--bg-secondary);
+}
+
+.chart-label {
+    color: var(--text-secondary);
+}
+
+.chart-value {
+    color: var(--text-primary);
+}
+
+/* Achievement Items */
+.achievement-item {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.achievement-name {
+    color: var(--text-primary);
+}
+
+.achievement-desc {
+    color: var(--text-muted);
+}
+
+/* Leaderboard */
+.leaderboard-list {
+    background: var(--bg-card);
+}
+
+.leaderboard-item {
+    border-bottom-color: var(--border-color);
+}
+
+.leaderboard-item:hover {
+    background: var(--bg-secondary);
+}
+
+.player-name {
+    color: var(--text-primary);
+}
+
+.player-score {
+    color: var(--text-muted);
+}
+
+/* Tips */
+.tip-card {
+    background: var(--bg-card);
+    border-left-color: #4ecdc4;
+}
+
+.tip-text {
+    color: var(--text-primary);
+}
+
+/* Modern Card Styles */
+.result-card, .activity-group, .achievement-item, .leaderboard-item {
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.activity-group:hover, .achievement-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--shadow);
+}
+
+/* Smooth Animations */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Dark Mode Specific Adjustments */
+[data-theme="dark"] .input-row input:focus {
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+}
+
+[data-theme="dark"] .quick-add:hover {
+    background: #38a169;
+}
+
+[data-theme="dark"] .calculate-btn:hover {
+    box-shadow: 0 12px 40px rgba(255, 107, 107, 0.3);
+}
+
+/* Achievement Popup Dark Mode */
+[data-theme="dark"] .achievement-content {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+/* Mobile Dark Mode Adjustments */
+@media (max-width: 768px) {
+    .theme-toggle {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        margin-right: 5px;
+    }
+}
