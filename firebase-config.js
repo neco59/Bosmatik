@@ -178,12 +178,13 @@ function updateAuthUI(user) {
             console.log('👤 Kullanıcı bilgileri:', { displayName, photoURL });
             
             userInfo.innerHTML = `
-                <div class="user-profile">
+                <div class="user-profile" onclick="openProfile()">
                     <div class="user-avatar-container">
                         ${photoURL ? 
                             `<img src="${photoURL}" alt="Profile" class="user-avatar">` : 
                             `<div class="user-avatar-emoji">👤</div>`
                         }
+                        <div class="edit-indicator">✏️</div>
                     </div>
                     <div class="user-details">
                         <div class="user-name">${displayName}</div>
@@ -192,6 +193,22 @@ function updateAuthUI(user) {
                 </div>
             `;
             console.log('✅ User info güncellendi');
+        }
+        
+        // Ensure buttons are visible and working after login
+        const settingsBtn = document.getElementById('settingsBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        if (settingsBtn) {
+            settingsBtn.style.display = 'block';
+            settingsBtn.onclick = openSettings;
+            console.log('✅ Settings button activated');
+        }
+        
+        if (themeToggle) {
+            themeToggle.style.display = 'block';
+            themeToggle.onclick = toggleTheme;
+            console.log('✅ Theme toggle activated');
         }
     } else {
         console.log('❌ Kullanıcı yok, giriş ekranını gösteriyorum...');
