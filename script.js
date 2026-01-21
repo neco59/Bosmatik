@@ -1751,11 +1751,21 @@ function updateSoundEffects() {
 // Firebase Login Functions
 async function loginWithGoogle() {
     try {
-        if (!window.firebaseService) {
-            console.error('Firebase servisi yüklenmemiş');
-            alert('Firebase servisi yükleniyor, lütfen bekleyin...');
-            return;
+        console.log('🔑 Google giriş fonksiyonu çağrıldı');
+        
+        // Firebase servisinin yüklenmesini bekle
+        let attempts = 0;
+        while (!window.firebaseService && attempts < 50) {
+            console.log('Firebase servisi bekleniyor...', attempts);
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
+        
+        if (!window.firebaseService) {
+            throw new Error('Firebase servisi yüklenemedi');
+        }
+        
+        console.log('Firebase servisi hazır, giriş yapılıyor...');
         const user = await window.firebaseService.loginWithGoogle();
         console.log('Google giriş başarılı:', user.displayName);
     } catch (error) {
