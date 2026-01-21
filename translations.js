@@ -505,9 +505,16 @@ function updateSettingsModalTexts() {
     }
 }
 
-// Sayfa yüklendiğinde dili uygula
+// Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
     updatePageTexts();
+    
+    // Firebase leaderboard'ını yükle
+    setTimeout(() => {
+        if (window.firebaseService) {
+            loadFirebaseLeaderboard();
+        }
+    }, 2000);
 });
 
 // Global fonksiyon olarak erişilebilir hale getir
