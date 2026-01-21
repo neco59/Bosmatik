@@ -16,14 +16,24 @@ const firebaseConfig = {
 function waitForFirebase() {
     return new Promise((resolve) => {
         if (typeof firebase !== 'undefined') {
+            console.log('✅ Firebase zaten yüklü');
             resolve();
         } else {
+            console.log('⏳ Firebase yükleniyor...');
             const checkFirebase = setInterval(() => {
                 if (typeof firebase !== 'undefined') {
+                    console.log('✅ Firebase yüklendi');
                     clearInterval(checkFirebase);
                     resolve();
                 }
             }, 100);
+            
+            // 10 saniye timeout
+            setTimeout(() => {
+                clearInterval(checkFirebase);
+                console.error('❌ Firebase yüklenemedi - timeout');
+                resolve();
+            }, 10000);
         }
     });
 }
@@ -44,12 +54,19 @@ class FirebaseService {
             console.log('🔥 Firebase başlatılıyor...');
             await waitForFirebase();
             
-            // Initialize Firebase
-            this.app = firebase.initializeApp(firebaseConfig);
+            // Initialize Firebase v8
+            if (!firebase.apps.length) {
+                this.app = firebase.initializeApp(firebaseConfig);
+                console.log('✅ Firebase app başlatıldı');
+            } else {
+                this.app = firebase.app();
+                console.log('✅ Firebase app zaten var');
+            }
+            
             this.auth = firebase.auth();
             this.db = firebase.firestore();
             
-            console.log('✅ Firebase başarıyla başlatıldı');
+            console.log('✅ Firebase servisleri başlatıldı');
             
             // Setup auth listener
             this.auth.onAuthStateChanged((user) => {
@@ -67,7 +84,7 @@ class FirebaseService {
             });
             
         } catch (error) {
-            console.error('Firebase başlatma hatası:', error);
+            console.error('❌ Firebase başlatma hatası:', error);
         }
     }
 
@@ -77,18 +94,39 @@ class FirebaseService {
             console.log('🔑 Google giriş başlatılıyor...');
             
             if (!this.auth) {
+                console.error('❌ Firebase Auth başlatılmamış');
                 throw new Error('Firebase Auth başlatılmamış');
             }
             
+            console.log('✅ Firebase Auth hazır');
+            
+            if (typeof firebase === 'undefined') {
+                console.error('❌ Firebase global objesi yok');
+                throw new Error('Firebase yüklenmemiş');
+            }
+            
+            console.log('✅ Firebase global objesi var');
+            
             const provider = new firebase.auth.GoogleAuthProvider();
+            console.log('✅ Google provider oluşturuldu');
+            
             provider.addScope('profile');
             provider.addScope('email');
+            console.log('✅ Scope\'lar eklendi');
             
+            console.log('🚀 signInWithPopup çağrılıyor...');
             const result = await this.auth.signInWithPopup(provider);
-            console.log('🔑 Google giriş başarılı:', result.user.displayName);
+            
+            console.log('🎉 Google giriş başarılı!');
+            console.log('Kullanıcı:', result.user.displayName);
+            console.log('Email:', result.user.email);
+            
             return result.user;
         } catch (error) {
-            console.error('Google giriş hatası:', error);
+            console.error('❌ Google giriş hatası:');
+            console.error('Hata kodu:', error.code);
+            console.error('Hata mesajı:', error.message);
+            console.error('Tam hata:', error);
             throw error;
         }
     }
