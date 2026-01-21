@@ -46,6 +46,7 @@ const translations = {
         newDayBtn: "🌅 Yeni Gün Başlat",
         clearBtn: "Temizle",
         calculateBtnShort: "Hesapla",
+        themeToggle: "Tema Değiştir",
         
         // Results
         todayLevel: "Bugünkü Boş Yapma Seviyesi:",
@@ -170,6 +171,7 @@ const translations = {
         newDayBtn: "🌅 Start New Day",
         clearBtn: "Clear",
         calculateBtnShort: "Calculate",
+        themeToggle: "Toggle Theme",
         
         // Results
         todayLevel: "Today's Time-Wasting Level:",
