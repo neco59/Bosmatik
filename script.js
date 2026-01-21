@@ -1,4 +1,4 @@
- class Bosmatik {
+class Bosmatik {
     constructor() {
         this.userData = this.loadUserData();
         this.achievements = this.initializeAchievements();
@@ -1266,10 +1266,27 @@ function updateLanguageButtons() {
     }
 }
 
+// Ensure language buttons work after login
+function ensureLanguageButtonsWork() {
+    const langTr = document.getElementById('lang-tr');
+    const langEn = document.getElementById('lang-en');
+    
+    if (langTr) {
+        langTr.onclick = () => changeLanguage('tr');
+    }
+    
+    if (langEn) {
+        langEn.onclick = () => changeLanguage('en');
+    }
+    
+    updateLanguageButtons();
+}
+
 // Sayfa yüklendiğinde dil butonlarını güncelle
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         updateLanguageButtons();
+        ensureLanguageButtonsWork();
     }, 100);
 });
 // Dark Mode Functionality
@@ -1304,10 +1321,10 @@ function loadTheme() {
     }
 }
 
-// Initialize theme on page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadTheme();
-});
+// Initialize theme on page load - handled by firebase-config.js
+// document.addEventListener('DOMContentLoaded', () => {
+//     loadTheme();
+// });
 
 // Modern UI Enhancements
 function addModernAnimations() {
@@ -1892,14 +1909,261 @@ function showSuccessMessage(message) {
     }, 3000);
 }
 
+// Firebase Leaderboard Integration
+async function updateFirebaseLeaderboard(score, activities) {
+    try {
+        if (!window.firebaseAuth || !window.firebaseAuth.currentUser || !window.firebaseDb) {
+            console.log('🔥 Firebase not ready for leaderboard update');
+            return;
+        }
+
+        const user = window.firebaseAuth.currentUser;
+        const today = new Date().toDateString();
+        
+        const leaderboardData = {
+            uid: user.uid,
+            displayName: user.displayName || 'Anonim Kullanıcı',
+            photoURL: user.photoURL || null,
+            score: score,
+            date: today,
+            timestamp: Date.now(),
+            activities: activities
+        };
+
+        // Update daily leaderboard
+        await window.firebaseDb.collection('leaderboard')
+            .doc(`${today}_${user.uid}`)
+            .set(leaderboardData);
+
+        console.log('✅ Firebase leaderboard updated:', score);
+        
+        // Load updated leaderboard
+        loadFirebaseLeaderboard();
+        
+    } catch (error) {
+        console.error('❌ Firebase leaderboard update error:', error);
+    }
+}
+
+async function loadFirebaseLeaderboard() {
+    try {
+        if (!window.firebaseDb) {
+            console.log('🔥 Firebase DB not ready');
+            return;
+        }
+
+        const today = new Date().toDateString();
+        
+        const snapshot = await window.firebaseDb.collection('leaderboard')
+            .where('date', '==', today)
+            .orderBy('score', 'desc')
+            .limit(10)
+            .get();
+
+        const leaderboardData = [];
+        snapshot.forEach(doc => {
+            leaderboardData.push(doc.data());
+        });
+
+        console.log('📊 Firebase leaderboard loaded:', leaderboardData.length, 'entries');
+        
+        // Update UI
+        displayFirebaseLeaderboard(leaderboardData);
+        
+    } catch (error) {
+        console.error('❌ Firebase leaderboard load error:', error);
+        // Fallback to local leaderboard
+        if (window.bosmatikApp) {
+            window.bosmatikApp.displayLeaderboard();
+        }
+    }
+}
+
+function displayFirebaseLeaderboard(data) {
+    const list = document.getElementById('leaderboardList');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    if (data.length === 0) {
+        list.innerHTML = '<div class="no-data">Henüz kimse puan girmemiş. İlk sen ol! 🎯</div>';
+        return;
+    }
+    
+    data.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+        
+        let rankClass = '';
+        if (index === 0) rankClass = 'gold';
+        else if (index === 1) rankClass = 'silver';
+        else if (index === 2) rankClass = 'bronze';
+        
+        // Check if this is current user
+        const isCurrentUser = window.firebaseAuth && 
+                             window.firebaseAuth.currentUser && 
+                             window.firebaseAuth.currentUser.uid === entry.uid;
+        
+        if (isCurrentUser) {
+            item.style.background = 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)';
+            item.style.border = '2px solid #f39c12';
+        }
+        
+        item.innerHTML = `
+            <div class="rank ${rankClass}">${index + 1}</div>
+            <div class="player-info">
+                <div class="user-info">
+                    ${entry.photoURL ? 
+                        `<img src="${entry.photoURL}" alt="Avatar" class="user-avatar-small">` : 
+                        `<div class="user-avatar-small" style="background: #4ecdc4; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">👤</div>`
+                    }
+                    <div>
+                        <div class="username">${entry.displayName}${isCurrentUser ? ' (Sen)' : ''}</div>
+                        <div class="score">${entry.score.toFixed(1)} boş puan</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        list.appendChild(item);
+    });
+}
+
+// Initialize Firebase leaderboard when auth state changes
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait for Firebase to be ready
+    setTimeout(() => {
+        if (window.firebaseAuth) {
+            window.firebaseAuth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Load leaderboard when user logs in
+                    setTimeout(() => {
+                        loadFirebaseLeaderboard();
+                    }, 1000);
+                }
+            });
+        }
+    }, 2000);
+});
+
 // Test notification function
 function testNotification() {
     if (!notificationManager) return;
     notificationManager.testNotification();
 }
-    if (!notificationManager) return;
-    notificationManager.testNotification();
+// Initialize notification manager
+document.addEventListener('DOMContentLoaded', () => {
+    notificationManager = new NotificationManager();
+    
+    // Başarı bildirimlerini entegre et
+    if (window.bosmatikApp) {
+        const originalShowAchievement = window.bosmatikApp.showAchievement;
+        window.bosmatikApp.showAchievement = function(title, description, category) {
+            originalShowAchievement.call(this, title, description, category);
+            if (notificationManager) {
+                notificationManager.sendAchievementNotification(title, description);
+            }
+        };
+    }
+});
+
+// Firebase Leaderboard Integration
+async function updateFirebaseLeaderboard(score, activities) {
+    try {
+        if (!window.firebaseAuth || !window.firebaseAuth.currentUser || !window.firebaseDb) {
+            console.log('Firebase henüz hazır değil, leaderboard güncellenemiyor');
+            return;
+        }
+
+        const user = window.firebaseAuth.currentUser;
+        const userData = {
+            uid: user.uid,
+            displayName: user.displayName || 'Anonim Kullanıcı',
+            photoURL: user.photoURL || null,
+            score: score,
+            timestamp: new Date(),
+            activities: activities
+        };
+
+        // Firestore'a kaydet
+        await window.firebaseDb.collection('leaderboard').doc(user.uid).set(userData);
+        console.log('✅ Firebase leaderboard güncellendi');
+
+    } catch (error) {
+        console.error('❌ Firebase leaderboard hatası:', error);
+    }
 }
+
+// Settings Modal Text Updates
+function updateSettingsModalTexts() {
+    const texts = {
+        settingsTitle: t('settings') || '⚙️ Ayarlar',
+        notificationSettingsTitle: t('notificationSettings') || '🔔 Bildirim Ayarları',
+        enableNotificationsLabel: t('enableNotifications') || 'Bildirimleri Etkinleştir',
+        notificationTimeLabel: t('notificationTime') || 'Günlük Hatırlatma Saati',
+        achievementNotificationsLabel: t('achievementNotifications') || 'Başarı Bildirimleri',
+        weeklyReportLabel: t('weeklyReport') || 'Haftalık Rapor',
+        appSettingsTitle: t('appSettings') || '📱 Uygulama Ayarları',
+        autoResetLabel: t('autoReset') || 'Otomatik Günlük Sıfırlama',
+        soundEffectsLabel: t('soundEffects') || 'Ses Efektleri',
+        testNotificationBtn: t('testNotification') || '🔔 Test Bildirimi Gönder'
+    };
+
+    Object.keys(texts).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = texts[id];
+        }
+    });
+}
+
+// Make functions globally available - CRITICAL for HTML onclick handlers
+window.openProfile = openProfile;
+window.closeProfile = closeProfile;
+window.selectAvatar = selectAvatar;
+window.saveProfile = saveProfile;
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
+window.toggleTheme = toggleTheme;
+window.testNotification = testNotification;
+window.updateFirebaseLeaderboard = updateFirebaseLeaderboard;
+
+// Debug: Log function availability
+console.log('🔧 Global functions registered:', {
+    openProfile: typeof window.openProfile,
+    openSettings: typeof window.openSettings,
+    toggleTheme: typeof window.toggleTheme
+});
+
+// Ensure functions are available immediately
+document.addEventListener('DOMContentLoaded', function() {
+    // Double-check function availability after DOM load
+    console.log('📋 DOM loaded, function check:', {
+        openProfile: typeof window.openProfile,
+        openSettings: typeof window.openSettings,
+        toggleTheme: typeof window.toggleTheme
+    });
+    
+    // Manually attach event listeners as backup
+    const settingsBtn = document.getElementById('settingsBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    
+    if (settingsBtn && !settingsBtn.onclick) {
+        settingsBtn.addEventListener('click', function() {
+            console.log('⚙️ Settings button clicked via event listener');
+            openSettings();
+        });
+        console.log('✅ Settings button event listener attached');
+    }
+    
+    if (themeToggle && !themeToggle.onclick) {
+        themeToggle.addEventListener('click', function() {
+            console.log('🌙 Theme toggle clicked via event listener');
+            toggleTheme();
+        });
+        console.log('✅ Theme toggle event listener attached');
+    }
+});
 
 // Initialize notification manager
 document.addEventListener('DOMContentLoaded', () => {
