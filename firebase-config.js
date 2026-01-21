@@ -90,6 +90,10 @@ async function loginWithGoogle() {
         console.log('🎉 Google giriş başarılı!');
         console.log('Kullanıcı:', result.user.displayName);
         
+        // Manuel UI güncelleme
+        console.log('🔄 UI manuel güncelleniyor...');
+        updateAuthUI(result.user);
+        
         return result.user;
         
     } catch (error) {
@@ -111,6 +115,10 @@ async function loginAnonymously() {
         const result = await window.firebaseAuth.signInAnonymously();
         console.log('🎉 Anonim giriş başarılı!');
         
+        // Manuel UI güncelleme
+        console.log('🔄 UI manuel güncelleniyor...');
+        updateAuthUI(result.user);
+        
         return result.user;
         
     } catch (error) {
@@ -125,6 +133,10 @@ async function logout() {
         if (window.firebaseAuth) {
             await window.firebaseAuth.signOut();
             console.log('👋 Çıkış yapıldı');
+            
+            // Manuel UI güncelleme
+            console.log('🔄 UI manuel güncelleniyor...');
+            updateAuthUI(null);
         }
     } catch (error) {
         console.error('❌ Çıkış hatası:', error);
@@ -133,18 +145,37 @@ async function logout() {
 
 // Update UI based on auth state
 function updateAuthUI(user) {
+    console.log('🔄 updateAuthUI çağrıldı, user:', user ? user.displayName : 'null');
+    
     const loginSection = document.getElementById('loginSection');
     const userSection = document.getElementById('userSection');
     const userInfo = document.getElementById('userInfo');
 
+    console.log('📋 DOM elementleri:', {
+        loginSection: !!loginSection,
+        userSection: !!userSection,
+        userInfo: !!userInfo
+    });
+
     if (user) {
-        // User logged in
-        if (loginSection) loginSection.style.display = 'none';
-        if (userSection) userSection.style.display = 'block';
+        console.log('✅ Kullanıcı var, giriş ekranını gizliyorum...');
+        
+        // User logged in - Hide login, show user section
+        if (loginSection) {
+            loginSection.style.display = 'none';
+            console.log('✅ Login section gizlendi');
+        }
+        
+        if (userSection) {
+            userSection.style.display = 'block';
+            console.log('✅ User section gösterildi');
+        }
         
         if (userInfo) {
             const displayName = user.displayName || 'Anonim Kullanıcı';
             const photoURL = user.photoURL;
+            
+            console.log('👤 Kullanıcı bilgileri:', { displayName, photoURL });
             
             userInfo.innerHTML = `
                 <div class="user-profile">
@@ -156,16 +187,28 @@ function updateAuthUI(user) {
                     </div>
                     <div class="user-details">
                         <div class="user-name">${displayName}</div>
-                        <div class="user-stats">Giriş yapıldı</div>
+                        <div class="user-stats">Giriş yapıldı ✅</div>
                     </div>
                 </div>
             `;
+            console.log('✅ User info güncellendi');
         }
     } else {
-        // User logged out
-        if (loginSection) loginSection.style.display = 'block';
-        if (userSection) userSection.style.display = 'none';
+        console.log('❌ Kullanıcı yok, giriş ekranını gösteriyorum...');
+        
+        // User logged out - Show login, hide user section
+        if (loginSection) {
+            loginSection.style.display = 'block';
+            console.log('✅ Login section gösterildi');
+        }
+        
+        if (userSection) {
+            userSection.style.display = 'none';
+            console.log('✅ User section gizlendi');
+        }
     }
+    
+    console.log('🎯 UI güncelleme tamamlandı');
 }
 
 // Make functions global
