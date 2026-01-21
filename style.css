@@ -2183,14 +2183,20 @@ main {
     margin-top: 5px;
 }
 
+.user-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
 .logout-btn {
     background: rgba(255, 107, 107, 0.1);
     color: #ff6b6b;
     border: 1px solid rgba(255, 107, 107, 0.3);
-    padding: 8px 12px;
+    padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .logout-btn:hover {
