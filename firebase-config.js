@@ -1,8 +1,5 @@
-// Firebase Configuration and Services
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+// Firebase Configuration and Services (Compat Version)
+// Using Firebase v9 compat for better browser support
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -15,19 +12,20 @@ const firebaseConfig = {
     measurementId: "G-5S01645R4Y"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-let messaging = null;
-
-// Initialize messaging if supported
-try {
-    if ('serviceWorker' in navigator) {
-        messaging = getMessaging(app);
-    }
-} catch (error) {
-    console.log('Messaging not supported:', error);
+// Wait for Firebase scripts to load
+function waitForFirebase() {
+    return new Promise((resolve) => {
+        if (typeof firebase !== 'undefined') {
+            resolve();
+        } else {
+            const checkFirebase = setInterval(() => {
+                if (typeof firebase !== 'undefined') {
+                    clearInterval(checkFirebase);
+                    resolve();
+                }
+            }, 100);
+        }
+    });
 }
 
 // Firebase Service Class
@@ -35,43 +33,58 @@ class FirebaseService {
     constructor() {
         this.currentUser = null;
         this.userProfile = null;
-        this.initializeAuth();
+        this.app = null;
+        this.auth = null;
+        this.db = null;
+        this.init();
     }
 
-    // Authentication
-    initializeAuth() {
-        onAuthStateChanged(auth, (user) => {
-            this.currentUser = user;
-            if (user) {
-                console.log('✅ Kullanıcı giriş yaptı:', user.uid);
-                this.loadUserProfile();
-                this.updateUserStatus();
-            } else {
-                console.log('❌ Kullanıcı çıkış yaptı');
-                this.currentUser = null;
-                this.userProfile = null;
-            }
-            this.updateUI();
-        });
-    }
-
-    // Anonymous Login
-    async loginAnonymously() {
+    async init() {
         try {
-            const result = await signInAnonymously(auth);
-            console.log('🎭 Anonim giriş başarılı:', result.user.uid);
-            return result.user;
+            console.log('🔥 Firebase başlatılıyor...');
+            await waitForFirebase();
+            
+            // Initialize Firebase
+            this.app = firebase.initializeApp(firebaseConfig);
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            
+            console.log('✅ Firebase başarıyla başlatıldı');
+            
+            // Setup auth listener
+            this.auth.onAuthStateChanged((user) => {
+                this.currentUser = user;
+                if (user) {
+                    console.log('✅ Kullanıcı giriş yaptı:', user.uid);
+                    this.loadUserProfile();
+                    this.updateUserStatus();
+                } else {
+                    console.log('❌ Kullanıcı çıkış yaptı');
+                    this.currentUser = null;
+                    this.userProfile = null;
+                }
+                this.updateUI();
+            });
+            
         } catch (error) {
-            console.error('Anonim giriş hatası:', error);
-            throw error;
+            console.error('Firebase başlatma hatası:', error);
         }
     }
 
     // Google Login
     async loginWithGoogle() {
         try {
-            const provider = new GoogleAuthProvider();
-            const result = await signInWithPopup(auth, provider);
+            console.log('🔑 Google giriş başlatılıyor...');
+            
+            if (!this.auth) {
+                throw new Error('Firebase Auth başlatılmamış');
+            }
+            
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            const result = await this.auth.signInWithPopup(provider);
             console.log('🔑 Google giriş başarılı:', result.user.displayName);
             return result.user;
         } catch (error) {
@@ -80,13 +93,31 @@ class FirebaseService {
         }
     }
 
+    // Anonymous Login
+    async loginAnonymously() {
+        try {
+            console.log('🎭 Anonim giriş başlatılıyor...');
+            
+            if (!this.auth) {
+                throw new Error('Firebase Auth başlatılmamış');
+            }
+            
+            const result = await this.auth.signInAnonymously();
+            console.log('🎭 Anonim giriş başarılı:', result.user.uid);
+            return result.user;
+        } catch (error) {
+            console.error('Anonim giriş hatası:', error);
+            throw error;
+        }
+    }
+
     // Load User Profile
     async loadUserProfile() {
-        if (!this.currentUser) return;
+        if (!this.currentUser || !this.db) return;
 
         try {
-            const userDoc = await getDoc(doc(db, 'users', this.currentUser.uid));
-            if (userDoc.exists()) {
+            const userDoc = await this.db.collection('users').doc(this.currentUser.uid).get();
+            if (userDoc.exists) {
                 this.userProfile = userDoc.data();
             } else {
                 // Create new user profile
@@ -98,56 +129,24 @@ class FirebaseService {
                     totalPoints: 0,
                     level: 1,
                     dailyStreak: 0,
-                    createdAt: serverTimestamp(),
-                    lastActive: serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                await setDoc(doc(db, 'users', this.currentUser.uid), this.userProfile);
+                await this.db.collection('users').doc(this.currentUser.uid).set(this.userProfile);
             }
         } catch (error) {
             console.error('Kullanıcı profili yükleme hatası:', error);
         }
     }
 
-    // Update User Profile
-    async updateUserProfile(displayName, customAvatar) {
-        if (!this.currentUser) {
-            throw new Error('Kullanıcı giriş yapmamış');
-        }
-
-        try {
-            // Update profile in Firestore
-            const updatedProfile = {
-                ...this.userProfile,
-                displayName: displayName,
-                customAvatar: customAvatar,
-                updatedAt: serverTimestamp()
-            };
-
-            await setDoc(doc(db, 'users', this.currentUser.uid), updatedProfile, { merge: true });
-            
-            // Update local profile
-            this.userProfile = updatedProfile;
-            
-            // Update UI
-            this.updateUI();
-            
-            console.log('✅ Profil güncellendi:', displayName, customAvatar);
-            return true;
-        } catch (error) {
-            console.error('Profil güncelleme hatası:', error);
-            throw error;
-        }
-    }
-
     // Update User Status
     async updateUserStatus() {
-        if (!this.currentUser || !this.userProfile) return;
+        if (!this.currentUser || !this.userProfile || !this.db) return;
 
         try {
-            await setDoc(doc(db, 'users', this.currentUser.uid), {
-                ...this.userProfile,
-                lastActive: serverTimestamp()
-            }, { merge: true });
+            await this.db.collection('users').doc(this.currentUser.uid).update({
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            });
         } catch (error) {
             console.error('Kullanıcı durumu güncelleme hatası:', error);
         }
@@ -155,7 +154,7 @@ class FirebaseService {
 
     // Submit Score
     async submitScore(scoreData) {
-        if (!this.currentUser) {
+        if (!this.currentUser || !this.db) {
             throw new Error('Kullanıcı giriş yapmamış');
         }
 
@@ -165,14 +164,15 @@ class FirebaseService {
                 userId: this.currentUser.uid,
                 displayName: this.userProfile?.displayName || 'Anonim Kullanıcı',
                 photoURL: this.userProfile?.photoURL || '',
+                customAvatar: this.userProfile?.customAvatar || '',
                 score: scoreData.score,
                 points: scoreData.points,
                 activities: scoreData.activities,
-                timestamp: serverTimestamp(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 date: new Date().toDateString()
             };
 
-            await addDoc(collection(db, 'scores'), scoreDoc);
+            await this.db.collection('scores').add(scoreDoc);
 
             // Update user profile
             const newTotalPoints = (this.userProfile?.totalPoints || 0) + scoreData.points;
@@ -186,7 +186,7 @@ class FirebaseService {
                 lastScoreDate: new Date().toDateString()
             };
 
-            await setDoc(doc(db, 'users', this.currentUser.uid), this.userProfile, { merge: true });
+            await this.db.collection('users').doc(this.currentUser.uid).update(this.userProfile);
 
             console.log('📊 Skor gönderildi:', scoreData.score);
             return true;
@@ -198,27 +198,24 @@ class FirebaseService {
 
     // Get Leaderboard
     async getLeaderboard(timeframe = 'daily', limitCount = 10) {
+        if (!this.db) return [];
+
         try {
-            let q;
-            const today = new Date().toDateString();
+            let query;
             
             if (timeframe === 'daily') {
                 // Today's scores
-                q = query(
-                    collection(db, 'scores'),
-                    orderBy('score', 'desc'),
-                    limit(limitCount)
-                );
+                query = this.db.collection('scores')
+                    .orderBy('score', 'desc')
+                    .limit(limitCount);
             } else if (timeframe === 'alltime') {
                 // All time best users
-                q = query(
-                    collection(db, 'users'),
-                    orderBy('totalPoints', 'desc'),
-                    limit(limitCount)
-                );
+                query = this.db.collection('users')
+                    .orderBy('totalPoints', 'desc')
+                    .limit(limitCount);
             }
 
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await query.get();
             const leaderboard = [];
             
             querySnapshot.forEach((doc) => {
@@ -238,52 +235,31 @@ class FirebaseService {
         }
     }
 
-    // Push Notifications
-    async requestNotificationPermission() {
-        if (!messaging) {
-            console.log('Messaging desteklenmiyor');
-            return false;
+    // Update User Profile
+    async updateUserProfile(displayName, customAvatar) {
+        if (!this.currentUser || !this.db) {
+            throw new Error('Kullanıcı giriş yapmamış');
         }
 
         try {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                const token = await getToken(messaging, {
-                    vapidKey: 'YOUR_VAPID_KEY' // Bu Firebase Console'dan alınacak
-                });
-                console.log('🔔 Notification token:', token);
-                
-                // Token'ı kullanıcı profiline kaydet
-                if (this.currentUser) {
-                    await setDoc(doc(db, 'users', this.currentUser.uid), {
-                        notificationToken: token
-                    }, { merge: true });
-                }
-                
-                return token;
-            }
-            return false;
-        } catch (error) {
-            console.error('Notification permission hatası:', error);
-            return false;
-        }
-    }
+            const updatedProfile = {
+                ...this.userProfile,
+                displayName: displayName,
+                customAvatar: customAvatar,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
-    // Listen for messages
-    setupMessageListener() {
-        if (!messaging) return;
-
-        onMessage(messaging, (payload) => {
-            console.log('📨 Mesaj alındı:', payload);
+            await this.db.collection('users').doc(this.currentUser.uid).update(updatedProfile);
             
-            // Show notification
-            if (payload.notification) {
-                new Notification(payload.notification.title, {
-                    body: payload.notification.body,
-                    icon: payload.notification.icon || './icon-192.png'
-                });
-            }
-        });
+            this.userProfile = updatedProfile;
+            this.updateUI();
+            
+            console.log('✅ Profil güncellendi:', displayName, customAvatar);
+            return true;
+        } catch (error) {
+            console.error('Profil güncelleme hatası:', error);
+            throw error;
+        }
     }
 
     // Update UI based on auth state
@@ -327,15 +303,17 @@ class FirebaseService {
     // Logout
     async logout() {
         try {
-            await auth.signOut();
-            console.log('👋 Çıkış yapıldı');
+            if (this.auth) {
+                await this.auth.signOut();
+                console.log('👋 Çıkış yapıldı');
+            }
         } catch (error) {
             console.error('Çıkış hatası:', error);
         }
     }
 }
 
-// Global Firebase Service Instance
-window.firebaseService = new FirebaseService();
-
-export default FirebaseService;
+// Initialize Firebase Service when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.firebaseService = new FirebaseService();
+});
