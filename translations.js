@@ -78,7 +78,50 @@ const translations = {
         maxHoursWarning: "⚠️ Maksimum 24 saat girilebilir!",
         maxHoursReached: "⚠️ Maksimum 24 saat sınırına ulaşıldı!",
         productiveAdded: "✨ Harika! Üretken aktivite eklendi! 💪",
-        newDayConfirm: "🔄 Yeni güne başlamak için tüm günlük verileri sıfırlamak istiyor musun?"
+        newDayConfirm: "🔄 Yeni güne başlamak için tüm günlük verileri sıfırlamak istiyor musun?",
+        
+        // Achievements
+        achievements: {
+            daily_first_entry: { name: "Günlük Giriş", desc: "Bugün ilk giriş" },
+            daily_social_limit: { name: "Sosyal Medya Kontrolü", desc: "Sosyal medyada 3 saatten az" },
+            daily_entertainment_limit: { name: "Eğlence Dengesi", desc: "Eğlence aktivitelerinde 2.5 saatten az" },
+            daily_productive_goal: { name: "Günlük Üretkenlik", desc: "2+ saat üretken aktivite" },
+            daily_balanced: { name: "Dengeli Gün", desc: "Hem boş hem üretken aktivite" },
+            daily_low_waste: { name: "Az Boş Yapan", desc: "5 saatten az boş aktivite" },
+            
+            week_streak: { name: "Haftalık Seri", desc: "7 gün üst üste giriş" },
+            week_social_master: { name: "Sosyal Medya Ustası", desc: "8+ saat sosyal medya (haftalık)" },
+            week_tiktok_addict: { name: "TikTok Bağımlısı", desc: "5+ saat TikTok" },
+            week_netflix_binge: { name: "Dizi Maratoncusu", desc: "6+ saat Netflix" },
+            week_gamer: { name: "Oyun Tutkunu", desc: "8+ saat oyun" },
+            week_bookworm: { name: "Kitap Kurdu", desc: "10+ saat kitap okuma" },
+            week_athlete: { name: "Sporcu Ruhu", desc: "8+ saat spor" },
+            
+            month_streak: { name: "Aylık Seri", desc: "30 gün üst üste giriş" },
+            month_multitasker: { name: "Çoklu Platform Ustası", desc: "10+ farklı platformda aktif" },
+            month_time_waster: { name: "Zaman Tüketicisi", desc: "50+ toplam boş saat" },
+            month_boş_master: { name: "Boş Yapma Ustası", desc: "35+ boş puan" },
+            month_learner: { name: "Öğrenme Gurusu", desc: "30+ saat öğrenme" },
+            month_balanced_master: { name: "Denge Ustası", desc: "20+ saat üretken aktivite" },
+            
+            year_legend: { name: "Boşmatik Efsanesi", desc: "365 gün üst üste giriş" },
+            year_point_master: { name: "Puan Koleksiyoncusu", desc: "100,000+ toplam puan" },
+            year_level_god: { name: "Seviye Tanrısı", desc: "50. seviyeye ulaş" },
+            year_boş_god: { name: "Boş Yapma Tanrısı", desc: "100+ boş puan tek seferde" },
+            year_productivity_king: { name: "Üretkenlik Kralı", desc: "500+ saat üretken aktivite" }
+        },
+        
+        // Tips
+        tips: [
+            "TikTok'ta 'sadece 5 dakika' diyerek başlayıp 3 saat geçirmek boş yapma sanatının zirvesidir! 🎭",
+            "Instagram'da arkadaşının arkadaşının tatil fotoğraflarına bakmak da boş yapma puanı kazandırır! 📸",
+            "YouTube'da 'nasıl üretken olunur' videoları izlemek ironik bir boş yapma aktivitesidir! 🤔",
+            "Online alışverişte sepete ekleyip almamak da bir boş yapma türüdür! 🛒",
+            "Sosyal medyada eski sevgilinin profilini stalklama = ekstra boş puan! 🕵️‍♂️",
+            "Netflix'te 30 dakika film seçmek, filmi izlemekten daha uzun sürebilir! 🎬",
+            "Telefonda oyun oynarken 'sadece bu level' demek ünlü son sözlerdendir! 🎮",
+            "Rastgele internet gezintisi sırasında nasıl buraya geldiğini unutmak normaldır! 🌐"
+        ]
     },
     
     en: {
@@ -159,7 +202,50 @@ const translations = {
         maxHoursWarning: "⚠️ Maximum 24 hours can be entered!",
         maxHoursReached: "⚠️ Maximum 24 hours limit reached!",
         productiveAdded: "✨ Great! Productive activity added! 💪",
-        newDayConfirm: "🔄 Do you want to reset all daily data to start a new day?"
+        newDayConfirm: "🔄 Do you want to reset all daily data to start a new day?",
+        
+        // Achievements
+        achievements: {
+            daily_first_entry: { name: "Daily Login", desc: "First login today" },
+            daily_social_limit: { name: "Social Media Control", desc: "Less than 3 hours on social media" },
+            daily_entertainment_limit: { name: "Entertainment Balance", desc: "Less than 2.5 hours on entertainment" },
+            daily_productive_goal: { name: "Daily Productivity", desc: "2+ hours of productive activity" },
+            daily_balanced: { name: "Balanced Day", desc: "Both wasting and productive activities" },
+            daily_low_waste: { name: "Low Waster", desc: "Less than 5 hours of wasting activities" },
+            
+            week_streak: { name: "Weekly Streak", desc: "7 consecutive days login" },
+            week_social_master: { name: "Social Media Master", desc: "8+ hours social media (weekly)" },
+            week_tiktok_addict: { name: "TikTok Addict", desc: "5+ hours TikTok" },
+            week_netflix_binge: { name: "Series Marathoner", desc: "6+ hours Netflix" },
+            week_gamer: { name: "Gaming Enthusiast", desc: "8+ hours gaming" },
+            week_bookworm: { name: "Bookworm", desc: "10+ hours reading" },
+            week_athlete: { name: "Athletic Spirit", desc: "8+ hours exercise" },
+            
+            month_streak: { name: "Monthly Streak", desc: "30 consecutive days login" },
+            month_multitasker: { name: "Multi-Platform Master", desc: "Active on 10+ platforms" },
+            month_time_waster: { name: "Time Consumer", desc: "50+ total wasting hours" },
+            month_boş_master: { name: "Wasting Master", desc: "35+ waste points" },
+            month_learner: { name: "Learning Guru", desc: "30+ hours learning" },
+            month_balanced_master: { name: "Balance Master", desc: "20+ hours productive activity" },
+            
+            year_legend: { name: "Wastematic Legend", desc: "365 consecutive days login" },
+            year_point_master: { name: "Point Collector", desc: "100,000+ total points" },
+            year_level_god: { name: "Level God", desc: "Reach level 50" },
+            year_boş_god: { name: "Wasting God", desc: "100+ waste points in single session" },
+            year_productivity_king: { name: "Productivity King", desc: "500+ hours productive activity" }
+        },
+        
+        // Tips
+        tips: [
+            "Starting with 'just 5 minutes' on TikTok and ending up spending 3 hours is the pinnacle of time-wasting art! 🎭",
+            "Looking at your friend's friend's vacation photos on Instagram also earns waste points! 📸",
+            "Watching 'how to be productive' videos on YouTube is an ironic waste activity! 🤔",
+            "Adding items to your cart and not buying them is also a type of time-wasting! 🛒",
+            "Stalking your ex's profile on social media = extra waste points! 🕵️‍♂️",
+            "Spending 30 minutes choosing a movie on Netflix can take longer than watching it! 🎬",
+            "Saying 'just this level' while playing mobile games are famous last words! 🎮",
+            "Forgetting how you got somewhere during random internet browsing is totally normal! 🌐"
+        ]
     }
 };
 
@@ -187,6 +273,7 @@ function changeLanguage(lang) {
     // Başarıları yeniden göster
     if (window.bosmatikApp) {
         window.bosmatikApp.displayAchievements();
+        window.bosmatikApp.generateDailyTip();
     }
 }
 
