@@ -28,6 +28,7 @@
     <div class="container">
         <header>
             <div class="language-selector">
+                <button class="settings-btn" onclick="openSettings()" id="settingsBtn">⚙️</button>
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
                 <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
                 <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
@@ -260,6 +261,65 @@
                 </div>
             </div>
         </main>
+        
+        <!-- Settings Modal -->
+        <div class="settings-modal" id="settingsModal" style="display: none;">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h3 id="settingsTitle">⚙️ Ayarlar</h3>
+                    <button class="close-btn" onclick="closeSettings()">✕</button>
+                </div>
+                
+                <div class="settings-body">
+                    <!-- Notification Settings -->
+                    <div class="setting-group">
+                        <h4 id="notificationSettingsTitle">🔔 Bildirim Ayarları</h4>
+                        
+                        <div class="setting-item">
+                            <label for="enableNotifications" id="enableNotificationsLabel">Bildirimleri Etkinleştir</label>
+                            <input type="checkbox" id="enableNotifications" onchange="toggleNotifications()">
+                        </div>
+                        
+                        <div class="setting-item" id="notificationTimeGroup" style="display: none;">
+                            <label for="notificationTime" id="notificationTimeLabel">Günlük Hatırlatma Saati</label>
+                            <input type="time" id="notificationTime" value="20:00" onchange="updateNotificationTime()">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="achievementNotifications" id="achievementNotificationsLabel">Başarı Bildirimleri</label>
+                            <input type="checkbox" id="achievementNotifications" checked onchange="updateAchievementNotifications()">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="weeklyReport" id="weeklyReportLabel">Haftalık Rapor</label>
+                            <input type="checkbox" id="weeklyReport" checked onchange="updateWeeklyReport()">
+                        </div>
+                    </div>
+                    
+                    <!-- App Settings -->
+                    <div class="setting-group">
+                        <h4 id="appSettingsTitle">📱 Uygulama Ayarları</h4>
+                        
+                        <div class="setting-item">
+                            <label for="autoReset" id="autoResetLabel">Otomatik Günlük Sıfırlama</label>
+                            <input type="checkbox" id="autoReset" checked onchange="updateAutoReset()">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="soundEffects" id="soundEffectsLabel">Ses Efektleri</label>
+                            <input type="checkbox" id="soundEffects" checked onchange="updateSoundEffects()">
+                        </div>
+                    </div>
+                    
+                    <!-- Test Notification -->
+                    <div class="setting-group">
+                        <button class="test-notification-btn" onclick="testNotification()" id="testNotificationBtn">
+                            🔔 Test Bildirimi Gönder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="translations.js"></script>
