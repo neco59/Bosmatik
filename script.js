@@ -387,13 +387,13 @@ class Bosmatik {
 
     getBoşLevel(score) {
         const levels = [
-            { min: 0, max: 2, name: 'Üretken Karınca', emoji: '🐜', color: '#48bb78' },
-            { min: 2, max: 5, name: 'Hafif Boşçu', emoji: '😊', color: '#4299e1' },
-            { min: 5, max: 8, name: 'Orta Seviye Boşçu', emoji: '😎', color: '#ed8936' },
-            { min: 8, max: 12, name: 'İleri Seviye Boşçu', emoji: '🤪', color: '#9f7aea' },
-            { min: 12, max: 16, name: 'Boş Yapma Ustası', emoji: '🏆', color: '#f56565' },
-            { min: 16, max: 20, name: 'Boş Yapma Efsanesi', emoji: '👑', color: '#d69e2e' },
-            { min: 20, max: Infinity, name: 'Boş Yapma Tanrısı', emoji: '🌟', color: '#805ad5' }
+            { min: 0, max: 2, name: t('levels.productive') || 'Üretken Karınca', emoji: '🐜', color: '#48bb78' },
+            { min: 2, max: 5, name: t('levels.lightWaster') || 'Hafif Boşçu', emoji: '😊', color: '#4299e1' },
+            { min: 5, max: 8, name: t('levels.mediumWaster') || 'Orta Seviye Boşçu', emoji: '😎', color: '#ed8936' },
+            { min: 8, max: 12, name: t('levels.advancedWaster') || 'İleri Seviye Boşçu', emoji: '🤪', color: '#9f7aea' },
+            { min: 12, max: 16, name: t('levels.master') || 'Boş Yapma Ustası', emoji: '🏆', color: '#f56565' },
+            { min: 16, max: 20, name: t('levels.legend') || 'Boş Yapma Efsanesi', emoji: '👑', color: '#d69e2e' },
+            { min: 20, max: Infinity, name: t('levels.god') || 'Boş Yapma Tanrısı', emoji: '🌟', color: '#805ad5' }
         ];
         
         return levels.find(level => score >= level.min && score < level.max) || levels[levels.length - 1];
@@ -675,10 +675,10 @@ class Bosmatik {
         };
         
         const categoryNames = {
-            daily: '🌅 Günlük',
-            weekly: '🔥 Haftalık',
-            monthly: '🏆 Aylık',
-            yearly: '🌟 Yıllık'
+            daily: t('categoryNames.daily') || '🌅 Günlük',
+            weekly: t('categoryNames.weekly') || '🔥 Haftalık',
+            monthly: t('categoryNames.monthly') || '🏆 Aylık',
+            yearly: t('categoryNames.yearly') || '🌟 Yıllık'
         };
         
         // unlockedAchievements yapısını kontrol et
@@ -875,7 +875,7 @@ class Bosmatik {
             }, 1000);
             
             // Show encouraging message
-            this.showSuccessMessage('✨ Harika! Üretken aktivite eklendi! 💪');
+            this.showSuccessMessage(t('productiveAdded') || '✨ Harika! Üretken aktivite eklendi! 💪');
         } else {
             // Regular animation for other activities
             input.style.background = '#c6f6d5';
