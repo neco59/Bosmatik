@@ -27,26 +27,51 @@
 <body>
     <div class="container">
         <header>
-            <div class="language-selector">
-                <button class="settings-btn" onclick="openSettings()" id="settingsBtn">⚙️</button>
-                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
-                <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
-                <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
+            <!-- Login Section -->
+            <div id="loginSection" class="login-section" style="display: block;">
+                <div class="login-container">
+                    <h2>🎮 Boşmatik'e Hoş Geldin!</h2>
+                    <p>Arkadaşlarınla yarışmak için giriş yap</p>
+                    <div class="login-buttons">
+                        <button class="login-btn google-login" onclick="loginWithGoogle()">
+                            <span>🔑</span>
+                            <span>Google ile Giriş</span>
+                        </button>
+                        <button class="login-btn anonymous-login" onclick="loginAnonymously()">
+                            <span>🎭</span>
+                            <span>Anonim Giriş</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <h1>🎮 Boşmatik</h1>
-            <p>Günlük boş yapma seviyeni keşfet ve arkadaşlarınla yarış!</p>
-            <div class="user-stats">
-                <div class="stat">
-                    <span class="stat-label">Seviye</span>
-                    <span class="stat-value" id="userLevel">1</span>
+
+            <!-- User Section -->
+            <div id="userSection" class="user-section" style="display: none;">
+                <div class="language-selector">
+                    <button class="settings-btn" onclick="openSettings()" id="settingsBtn">⚙️</button>
+                    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+                    <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
+                    <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
+                    <button class="logout-btn" onclick="logout()" id="logoutBtn">🚪</button>
                 </div>
-                <div class="stat">
-                    <span class="stat-label">Toplam Puan</span>
-                    <span class="stat-value" id="totalPoints">0</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Günlük Seri</span>
-                    <span class="stat-value" id="dailyStreak">0</span>
+                
+                <div id="userInfo" class="user-info"></div>
+                
+                <h1>🎮 Boşmatik</h1>
+                <p>Günlük boş yapma seviyeni keşfet ve arkadaşlarınla yarış!</p>
+                <div class="user-stats">
+                    <div class="stat">
+                        <span class="stat-label">Seviye</span>
+                        <span class="stat-value" id="userLevel">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Toplam Puan</span>
+                        <span class="stat-value" id="totalPoints">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Günlük Seri</span>
+                        <span class="stat-value" id="dailyStreak">0</span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -323,6 +348,7 @@
     </div>
 
     <script src="translations.js"></script>
+    <script type="module" src="firebase-config.js"></script>
     <script src="script.js"></script>
     
     <!-- PWA Service Worker -->
