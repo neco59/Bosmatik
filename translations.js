@@ -68,6 +68,7 @@ const translations = {
         weeklyReportBody: "Bu hafta toplam {hours} saat boş yaptın!",
         testNotificationTitle: "🔔 Test Bildirimi",
         testNotificationBody: "Bildirimler düzgün çalışıyor! 🎉",
+        testNotificationSent: "🔔 Test bildirimi gönderildi!",
         notificationsEnabled: "🔔 Bildirimler etkinleştirildi!",
         notificationsDisabled: "🔕 Bildirimler devre dışı bırakıldı.",
         notificationNotSupported: "Bu tarayıcı bildirimleri desteklemiyor.",
@@ -118,6 +119,7 @@ const translations = {
         newAchievement: "🏆 Yeni Başarı!",
         achievementUnlocked: "Başarı Kilidi Açıldı!",
         bonusPoints: "Bonus Puan",
+        levelUpMessage: "Tebrikler! {level}. seviyeye ulaştınız! 🎉",
         
         // Achievements
         achievements: {
@@ -231,6 +233,7 @@ const translations = {
         weeklyReportBody: "You wasted {hours} hours this week!",
         testNotificationTitle: "🔔 Test Notification",
         testNotificationBody: "Notifications are working properly! 🎉",
+        testNotificationSent: "🔔 Test notification sent!",
         notificationsEnabled: "🔔 Notifications enabled!",
         notificationsDisabled: "🔕 Notifications disabled.",
         notificationNotSupported: "This browser doesn't support notifications.",
@@ -281,6 +284,7 @@ const translations = {
         newAchievement: "🏆 New Achievement!",
         achievementUnlocked: "Achievement Unlocked!",
         bonusPoints: "Bonus Points",
+        levelUpMessage: "Congratulations! You reached level {level}! 🎉",
         
         // Achievements
         achievements: {
@@ -348,11 +352,20 @@ function changeLanguage(lang) {
     localStorage.setItem('bosmatik-language', lang);
     updatePageTexts();
     
+    // Update settings modal if it's open
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal && settingsModal.style.display === 'flex') {
+        updateSettingsTexts();
+    }
+    
     // Başarıları yeniden göster
     if (window.bosmatikApp) {
         window.bosmatikApp.displayAchievements();
         window.bosmatikApp.generateDailyTip();
     }
+    
+    // Update language buttons
+    updateLanguageButtons();
 }
 
 // Sayfa metinlerini güncelle
@@ -434,9 +447,68 @@ function updatePageTexts() {
     if (achievementOkBtn) {
         achievementOkBtn.textContent = t('okBtn');
     }
+    
+    // Settings modal - her zaman güncelle
+    updateSettingsModalTexts();
+}
+
+// Ayarlar modalı metinlerini güncelle (ayrı fonksiyon)
+function updateSettingsModalTexts() {
+    const settingsTitle = document.getElementById('settingsTitle');
+    if (settingsTitle) {
+        settingsTitle.textContent = t('settings');
+    }
+    
+    const notificationSettingsTitle = document.getElementById('notificationSettingsTitle');
+    if (notificationSettingsTitle) {
+        notificationSettingsTitle.textContent = t('notificationSettings');
+    }
+    
+    const appSettingsTitle = document.getElementById('appSettingsTitle');
+    if (appSettingsTitle) {
+        appSettingsTitle.textContent = t('appSettings');
+    }
+    
+    const enableNotificationsLabel = document.getElementById('enableNotificationsLabel');
+    if (enableNotificationsLabel) {
+        enableNotificationsLabel.textContent = t('enableNotifications');
+    }
+    
+    const notificationTimeLabel = document.getElementById('notificationTimeLabel');
+    if (notificationTimeLabel) {
+        notificationTimeLabel.textContent = t('notificationTime');
+    }
+    
+    const achievementNotificationsLabel = document.getElementById('achievementNotificationsLabel');
+    if (achievementNotificationsLabel) {
+        achievementNotificationsLabel.textContent = t('achievementNotifications');
+    }
+    
+    const weeklyReportLabel = document.getElementById('weeklyReportLabel');
+    if (weeklyReportLabel) {
+        weeklyReportLabel.textContent = t('weeklyReport');
+    }
+    
+    const autoResetLabel = document.getElementById('autoResetLabel');
+    if (autoResetLabel) {
+        autoResetLabel.textContent = t('autoReset');
+    }
+    
+    const soundEffectsLabel = document.getElementById('soundEffectsLabel');
+    if (soundEffectsLabel) {
+        soundEffectsLabel.textContent = t('soundEffects');
+    }
+    
+    const testNotificationBtn = document.getElementById('testNotificationBtn');
+    if (testNotificationBtn) {
+        testNotificationBtn.textContent = t('testNotification');
+    }
 }
 
 // Sayfa yüklendiğinde dili uygula
 document.addEventListener('DOMContentLoaded', () => {
     updatePageTexts();
 });
+
+// Global fonksiyon olarak erişilebilir hale getir
+window.updateSettingsModalTexts = updateSettingsModalTexts;
