@@ -121,6 +121,17 @@ const translations = {
         bonusPoints: "Bonus Puan",
         levelUpMessage: "Tebrikler! {level}. seviyeye ulaştınız! 🎉",
         
+        // Profile
+        editProfile: "👤 Profil Düzenle",
+        displayName: "Görünen İsim",
+        selectAvatar: "Avatar Seç",
+        cancel: "İptal",
+        save: "Kaydet",
+        displayNameRequired: "Görünen isim gerekli!",
+        displayNameTooLong: "Görünen isim çok uzun! (Max 20 karakter)",
+        profileUpdated: "✅ Profil güncellendi!",
+        profileUpdateError: "Profil güncellenirken hata oluştu:",
+        
         // Achievements
         achievements: {
             daily_first_entry: { name: "Günlük Giriş", desc: "Bugün ilk giriş" },
@@ -285,6 +296,17 @@ const translations = {
         achievementUnlocked: "Achievement Unlocked!",
         bonusPoints: "Bonus Points",
         levelUpMessage: "Congratulations! You reached level {level}! 🎉",
+        
+        // Profile
+        editProfile: "👤 Edit Profile",
+        displayName: "Display Name",
+        selectAvatar: "Select Avatar",
+        cancel: "Cancel",
+        save: "Save",
+        displayNameRequired: "Display name is required!",
+        displayNameTooLong: "Display name too long! (Max 20 characters)",
+        profileUpdated: "✅ Profile updated!",
+        profileUpdateError: "Error updating profile:",
         
         // Achievements
         achievements: {
