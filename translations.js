@@ -49,6 +49,32 @@ const translations = {
         themeToggle: "Tema Değiştir",
         okBtn: "Tamam",
         
+        // Settings
+        settings: "⚙️ Ayarlar",
+        notificationSettings: "🔔 Bildirim Ayarları",
+        appSettings: "📱 Uygulama Ayarları",
+        enableNotifications: "Bildirimleri Etkinleştir",
+        notificationTime: "Günlük Hatırlatma Saati",
+        achievementNotifications: "Başarı Bildirimleri",
+        weeklyReport: "Haftalık Rapor",
+        autoReset: "Otomatik Günlük Sıfırlama",
+        soundEffects: "Ses Efektleri",
+        testNotification: "🔔 Test Bildirimi Gönder",
+        
+        // Notifications
+        dailyReminderTitle: "🎮 Boşmatik",
+        dailyReminderBody: "Bugün ne kadar boş yaptın? Hemen kontrol et!",
+        weeklyReportTitle: "📊 Haftalık Rapor",
+        weeklyReportBody: "Bu hafta toplam {hours} saat boş yaptın!",
+        testNotificationTitle: "🔔 Test Bildirimi",
+        testNotificationBody: "Bildirimler düzgün çalışıyor! 🎉",
+        notificationsEnabled: "🔔 Bildirimler etkinleştirildi!",
+        notificationsDisabled: "🔕 Bildirimler devre dışı bırakıldı.",
+        notificationNotSupported: "Bu tarayıcı bildirimleri desteklemiyor.",
+        notificationDenied: "Bildirimler engellenmiş. Tarayıcı ayarlarından etkinleştirin.",
+        openApp: "Uygulamayı Aç",
+        dismiss: "Kapat",
+        
         // Results
         todayLevel: "Bugünkü Boş Yapma Seviyesi:",
         pointsLabel: "Boş Puan",
@@ -185,6 +211,32 @@ const translations = {
         calculateBtnShort: "Calculate",
         themeToggle: "Toggle Theme",
         okBtn: "OK",
+        
+        // Settings
+        settings: "⚙️ Settings",
+        notificationSettings: "🔔 Notification Settings",
+        appSettings: "📱 App Settings",
+        enableNotifications: "Enable Notifications",
+        notificationTime: "Daily Reminder Time",
+        achievementNotifications: "Achievement Notifications",
+        weeklyReport: "Weekly Report",
+        autoReset: "Auto Daily Reset",
+        soundEffects: "Sound Effects",
+        testNotification: "🔔 Send Test Notification",
+        
+        // Notifications
+        dailyReminderTitle: "🎮 Wastematic",
+        dailyReminderBody: "How much time did you waste today? Check now!",
+        weeklyReportTitle: "📊 Weekly Report",
+        weeklyReportBody: "You wasted {hours} hours this week!",
+        testNotificationTitle: "🔔 Test Notification",
+        testNotificationBody: "Notifications are working properly! 🎉",
+        notificationsEnabled: "🔔 Notifications enabled!",
+        notificationsDisabled: "🔕 Notifications disabled.",
+        notificationNotSupported: "This browser doesn't support notifications.",
+        notificationDenied: "Notifications are blocked. Enable them in browser settings.",
+        openApp: "Open App",
+        dismiss: "Dismiss",
         
         // Results
         todayLevel: "Today's Time-Wasting Level:",
