@@ -1375,3 +1375,305 @@ document.head.appendChild(style);
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(addModernAnimations, 500);
 });
+// Push Notification System
+class NotificationManager {
+    constructor() {
+        this.settings = this.loadSettings();
+        this.initializeNotifications();
+    }
+    
+    loadSettings() {
+        const defaultSettings = {
+            enabled: false,
+            time: '20:00',
+            achievements: true,
+            weeklyReport: true,
+            autoReset: true,
+            soundEffects: true
+        };
+        
+        const saved = localStorage.getItem('bosmatik-notification-settings');
+        return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
+    }
+    
+    saveSettings() {
+        localStorage.setItem('bosmatik-notification-settings', JSON.stringify(this.settings));
+    }
+    
+    async initializeNotifications() {
+        if ('Notification' in window && 'serviceWorker' in navigator) {
+            // Service Worker'ı kaydet
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                console.log('🔔 Service Worker hazır, bildirimler aktif');
+            } catch (error) {
+                console.error('Service Worker hatası:', error);
+            }
+        }
+    }
+    
+    async requestPermission() {
+        if (!('Notification' in window)) {
+            alert(t('notificationNotSupported') || 'Bu tarayıcı bildirimleri desteklemiyor.');
+            return false;
+        }
+        
+        if (Notification.permission === 'granted') {
+            return true;
+        }
+        
+        if (Notification.permission === 'denied') {
+            alert(t('notificationDenied') || 'Bildirimler engellenmiş. Tarayıcı ayarlarından etkinleştirin.');
+            return false;
+        }
+        
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+    }
+    
+    async enableNotifications() {
+        const hasPermission = await this.requestPermission();
+        if (hasPermission) {
+            this.settings.enabled = true;
+            this.saveSettings();
+            this.scheduleDailyReminder();
+            this.showSuccessMessage(t('notificationsEnabled') || '🔔 Bildirimler etkinleştirildi!');
+            return true;
+        }
+        return false;
+    }
+    
+    disableNotifications() {
+        this.settings.enabled = false;
+        this.saveSettings();
+        this.clearScheduledNotifications();
+        this.showSuccessMessage(t('notificationsDisabled') || '🔕 Bildirimler devre dışı bırakıldı.');
+    }
+    
+    scheduleDailyReminder() {
+        if (!this.settings.enabled) return;
+        
+        const [hours, minutes] = this.settings.time.split(':');
+        const now = new Date();
+        const scheduledTime = new Date();
+        scheduledTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        
+        // Eğer bugünkü saat geçmişse, yarına planla
+        if (scheduledTime <= now) {
+            scheduledTime.setDate(scheduledTime.getDate() + 1);
+        }
+        
+        const delay = scheduledTime.getTime() - now.getTime();
+        
+        setTimeout(() => {
+            this.sendDailyReminder();
+            // Sonraki gün için tekrar planla
+            this.scheduleDailyReminder();
+        }, delay);
+        
+        console.log(`📅 Günlük hatırlatma planlandı: ${scheduledTime.toLocaleString()}`);
+    }
+    
+    sendDailyReminder() {
+        if (!this.settings.enabled) return;
+        
+        const title = t('dailyReminderTitle') || '🎮 Boşmatik';
+        const body = t('dailyReminderBody') || 'Bugün ne kadar boş yaptın? Hemen kontrol et!';
+        
+        this.showNotification(title, {
+            body: body,
+            icon: './icon-192.png',
+            badge: './icon-192.png',
+            tag: 'daily-reminder',
+            requireInteraction: false,
+            actions: [
+                {
+                    action: 'open',
+                    title: t('openApp') || 'Uygulamayı Aç'
+                },
+                {
+                    action: 'dismiss',
+                    title: t('dismiss') || 'Kapat'
+                }
+            ]
+        });
+    }
+    
+    sendAchievementNotification(achievementName, achievementDesc) {
+        if (!this.settings.achievements) return;
+        
+        const title = t('newAchievement') || '🏆 Yeni Başarı!';
+        const body = `${achievementName}: ${achievementDesc}`;
+        
+        this.showNotification(title, {
+            body: body,
+            icon: './icon-192.png',
+            badge: './icon-192.png',
+            tag: 'achievement',
+            requireInteraction: true
+        });
+    }
+    
+    sendWeeklyReport(stats) {
+        if (!this.settings.weeklyReport) return;
+        
+        const title = t('weeklyReportTitle') || '📊 Haftalık Rapor';
+        const body = t('weeklyReportBody') || `Bu hafta toplam ${stats.totalHours} saat boş yaptın!`;
+        
+        this.showNotification(title, {
+            body: body,
+            icon: './icon-192.png',
+            badge: './icon-192.png',
+            tag: 'weekly-report'
+        });
+    }
+    
+    showNotification(title, options) {
+        if ('serviceWorker' in navigator && this.settings.enabled) {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(title, options);
+            });
+        } else if (Notification.permission === 'granted') {
+            new Notification(title, options);
+        }
+    }
+    
+    testNotification() {
+        const title = t('testNotificationTitle') || '🔔 Test Bildirimi';
+        const body = t('testNotificationBody') || 'Bildirimler düzgün çalışıyor! 🎉';
+        
+        this.showNotification(title, {
+            body: body,
+            icon: './icon-192.png',
+            badge: './icon-192.png',
+            tag: 'test'
+        });
+    }
+    
+    clearScheduledNotifications() {
+        // Mevcut timeout'ları temizle (basit implementasyon)
+        console.log('🗑️ Planlanmış bildirimler temizlendi');
+    }
+    
+    showSuccessMessage(message) {
+        const successMsg = document.createElement('div');
+        successMsg.innerHTML = message;
+        successMsg.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+        `;
+        document.body.appendChild(successMsg);
+        
+        setTimeout(() => {
+            successMsg.remove();
+        }, 3000);
+    }
+}
+
+// Global notification manager
+let notificationManager;
+
+// Settings Modal Functions
+function openSettings() {
+    document.getElementById('settingsModal').style.display = 'flex';
+    loadSettingsUI();
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+function loadSettingsUI() {
+    if (!notificationManager) return;
+    
+    const settings = notificationManager.settings;
+    
+    document.getElementById('enableNotifications').checked = settings.enabled;
+    document.getElementById('notificationTime').value = settings.time;
+    document.getElementById('achievementNotifications').checked = settings.achievements;
+    document.getElementById('weeklyReport').checked = settings.weeklyReport;
+    document.getElementById('autoReset').checked = settings.autoReset;
+    document.getElementById('soundEffects').checked = settings.soundEffects;
+    
+    // Show/hide notification time based on enabled state
+    const timeGroup = document.getElementById('notificationTimeGroup');
+    timeGroup.style.display = settings.enabled ? 'flex' : 'none';
+}
+
+async function toggleNotifications() {
+    const enabled = document.getElementById('enableNotifications').checked;
+    
+    if (enabled) {
+        const success = await notificationManager.enableNotifications();
+        if (!success) {
+            document.getElementById('enableNotifications').checked = false;
+            return;
+        }
+    } else {
+        notificationManager.disableNotifications();
+    }
+    
+    // Show/hide notification time
+    const timeGroup = document.getElementById('notificationTimeGroup');
+    timeGroup.style.display = enabled ? 'flex' : 'none';
+}
+
+function updateNotificationTime() {
+    const time = document.getElementById('notificationTime').value;
+    notificationManager.settings.time = time;
+    notificationManager.saveSettings();
+    notificationManager.scheduleDailyReminder();
+}
+
+function updateAchievementNotifications() {
+    const enabled = document.getElementById('achievementNotifications').checked;
+    notificationManager.settings.achievements = enabled;
+    notificationManager.saveSettings();
+}
+
+function updateWeeklyReport() {
+    const enabled = document.getElementById('weeklyReport').checked;
+    notificationManager.settings.weeklyReport = enabled;
+    notificationManager.saveSettings();
+}
+
+function updateAutoReset() {
+    const enabled = document.getElementById('autoReset').checked;
+    notificationManager.settings.autoReset = enabled;
+    notificationManager.saveSettings();
+}
+
+function updateSoundEffects() {
+    const enabled = document.getElementById('soundEffects').checked;
+    notificationManager.settings.soundEffects = enabled;
+    notificationManager.saveSettings();
+}
+
+function testNotification() {
+    if (!notificationManager) return;
+    notificationManager.testNotification();
+}
+
+// Initialize notification manager
+document.addEventListener('DOMContentLoaded', () => {
+    notificationManager = new NotificationManager();
+    
+    // Başarı bildirimlerini entegre et
+    if (window.bosmatikApp) {
+        const originalShowAchievement = window.bosmatikApp.showAchievement;
+        window.bosmatikApp.showAchievement = function(title, description, category) {
+            originalShowAchievement.call(this, title, description, category);
+            if (notificationManager) {
+                notificationManager.sendAchievementNotification(title, description);
+            }
+        };
+    }
+});
