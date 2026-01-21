@@ -27,6 +27,10 @@ header {
     text-align: center;
     margin-bottom: 30px;
     color: white;
+    position: relative;
+    padding-top: 60px; /* Increased space for buttons */
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 header h1 {
@@ -287,6 +291,12 @@ main {
 @media (max-width: 600px) {
     .container {
         padding: 10px;
+    }
+    
+    header {
+        padding-top: 45px; /* Adjust for mobile buttons */
+        padding-left: 15px;
+        padding-right: 15px;
     }
     
     header h1 {
@@ -1430,6 +1440,12 @@ main {
         padding: 10px;
     }
     
+    header {
+        padding-top: 60px; /* More space for stacked buttons */
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
     .input-row {
         flex-direction: column;
         align-items: stretch;
@@ -1489,58 +1505,188 @@ main {
         opacity: 1;
     }
 }
-/* Language Selector */
+/* Language Selector - Improved Layout */
 .language-selector {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    right: 15px;
     display: flex;
-    gap: 5px;
+    gap: 8px;
     z-index: 100;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
 }
 
-.lang-btn {
-    background: rgba(255, 255, 255, 0.2);
+.lang-btn, .theme-toggle, .settings-btn {
+    background: rgba(255, 255, 255, 0.15);
     color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 5px 8px;
+    border-radius: 16px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    min-height: 28px;
+    box-sizing: border-box;
 }
 
-.lang-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
+.lang-btn:hover, .theme-toggle:hover, .settings-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
 }
 
 .lang-btn.active {
     background: rgba(255, 255, 255, 0.9);
     color: #333;
     border-color: white;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Individual button styles */
+.settings-btn {
+    padding: 5px 6px;
+    min-width: 28px;
+    font-size: 0.85rem;
+}
+
+.theme-toggle {
+    padding: 5px 6px;
+    min-width: 28px;
+    font-size: 0.85rem;
+}
+
+.lang-btn {
+    padding: 5px 6px;
+    font-size: 0.7rem;
+    min-width: 34px;
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) {
+    .language-selector {
+        gap: 2px;
+        top: 5px;
+        right: 5px;
+    }
+    
+    .lang-btn, .theme-toggle, .settings-btn {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+        min-height: 26px;
+        border-radius: 14px;
+    }
+    
+    .settings-btn, .theme-toggle {
+        min-width: 26px;
+        padding: 4px 5px;
+    }
+    
+    .lang-btn {
+        min-width: 30px;
+        font-size: 0.65rem;
+    }
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
     .language-selector {
-        top: 10px;
-        right: 10px;
+        top: 4px;
+        right: 4px;
+        gap: 1px;
+    }
+    
+    .lang-btn, .theme-toggle, .settings-btn {
+        padding: 3px 5px;
+        font-size: 0.65rem;
+        min-height: 24px;
+        border-radius: 12px;
+    }
+    
+    .settings-btn, .theme-toggle {
+        min-width: 24px;
+        padding: 3px 4px;
     }
     
     .lang-btn {
-        padding: 6px 10px;
-        font-size: 0.8rem;
+        min-width: 26px;
+        font-size: 0.6rem;
+    }
+}
+
+/* Small mobile screens - Compact layout */
+@media (max-width: 480px) {
+    .language-selector {
+        gap: 1px;
+        top: 3px;
+        right: 3px;
+    }
+    
+    .lang-btn, .theme-toggle, .settings-btn {
+        padding: 2px 4px;
+        font-size: 0.6rem;
+        min-height: 22px;
+        border-radius: 11px;
+    }
+    
+    .settings-btn, .theme-toggle {
+        min-width: 22px;
+        padding: 2px 3px;
+    }
+    
+    .lang-btn {
+        min-width: 24px;
+        font-size: 0.55rem;
+    }
+}
+
+/* Very small screens - Ultra compact */
+@media (max-width: 360px) {
+    .language-selector {
+        flex-direction: row;
+        align-items: center;
+        gap: 1px;
+        top: 2px;
+        right: 2px;
+    }
+    
+    .lang-btn, .theme-toggle, .settings-btn {
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border-radius: 10px;
+        font-size: 0.5rem;
+        min-height: auto;
+        min-width: auto;
+    }
+    
+    .lang-btn {
+        width: 22px;
+        font-size: 0.45rem;
     }
 }
 
 /* Header position adjustment */
 header {
     position: relative;
+    padding-top: 35px; /* Reduced for better mobile layout */
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+@media (max-width: 600px) {
+    header {
+        padding-top: 30px; /* Reduced for mobile */
+        padding-left: 15px;
+        padding-right: 15px;
+    }
 }
 /* Dark Mode Variables */
 :root {
@@ -1769,26 +1915,6 @@ main {
         margin-right: 5px;
     }
 }
-/* Settings Button */
-.settings-btn {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    margin-right: 10px;
-}
-
-.settings-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
-}
-
 /* Settings Modal */
 .settings-modal {
     position: fixed;
