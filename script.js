@@ -1,4 +1,4 @@
-class Bosmatik {
+ class Bosmatik {
     constructor() {
         this.userData = this.loadUserData();
         this.achievements = this.initializeAchievements();
@@ -1746,6 +1746,150 @@ function updateSoundEffects() {
     const enabled = document.getElementById('soundEffects').checked;
     notificationManager.settings.soundEffects = enabled;
     notificationManager.saveSettings();
+}
+
+// Profile Management Functions
+let selectedAvatar = '👤';
+
+function openProfile() {
+    console.log('👤 Profil modalı açılıyor...');
+    const modal = document.getElementById('profileModal');
+    if (!modal) {
+        console.error('❌ Profile modal bulunamadı');
+        return;
+    }
+    
+    // Load current user data from Firebase
+    if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+        const user = window.firebaseAuth.currentUser;
+        document.getElementById('displayName').value = user.displayName || '';
+        document.getElementById('currentName').textContent = user.displayName || 'Anonim Kullanıcı';
+        
+        if (user.photoURL) {
+            document.getElementById('currentAvatar').innerHTML = `<img src="${user.photoURL}" alt="Profile" class="current-avatar-img">`;
+        } else {
+            document.getElementById('currentAvatar').textContent = '👤';
+            selectedAvatar = '👤';
+            selectAvatar('👤');
+        }
+    }
+    
+    modal.style.display = 'flex';
+    updateProfileTexts();
+}
+
+function closeProfile() {
+    console.log('❌ Profil modalı kapatılıyor...');
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function selectAvatar(avatar) {
+    selectedAvatar = avatar;
+    
+    // Update visual selection
+    document.querySelectorAll('.avatar-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    const selectedOption = document.querySelector(`[data-avatar="${avatar}"]`);
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+    }
+    
+    // Update preview
+    const currentAvatar = document.getElementById('currentAvatar');
+    if (currentAvatar) {
+        currentAvatar.textContent = avatar;
+    }
+}
+
+async function saveProfile() {
+    const displayName = document.getElementById('displayName').value.trim();
+    
+    if (!displayName) {
+        alert(t('displayNameRequired') || 'Görünen isim gerekli!');
+        return;
+    }
+    
+    if (displayName.length > 20) {
+        alert(t('displayNameTooLong') || 'Görünen isim çok uzun! (Max 20 karakter)');
+        return;
+    }
+    
+    try {
+        // Update Firebase user profile
+        if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+            await window.firebaseAuth.currentUser.updateProfile({
+                displayName: displayName
+            });
+            
+            console.log('✅ Profil güncellendi:', displayName);
+            
+            // Update UI
+            updateAuthUI(window.firebaseAuth.currentUser);
+            
+            // Show success message
+            showSuccessMessage(t('profileUpdated') || '✅ Profil güncellendi!');
+            
+            closeProfile();
+        }
+    } catch (error) {
+        console.error('❌ Profil kaydetme hatası:', error);
+        alert(t('profileUpdateError') || 'Profil güncellenirken hata oluştu: ' + error.message);
+    }
+}
+
+function updateProfileTexts() {
+    // Update profile modal texts based on current language
+    const profileTitle = document.getElementById('profileTitle');
+    if (profileTitle) {
+        profileTitle.textContent = t('editProfile') || '👤 Profil Düzenle';
+    }
+    
+    const displayNameLabel = document.getElementById('displayNameLabel');
+    if (displayNameLabel) {
+        displayNameLabel.textContent = t('displayName') || 'Görünen İsim';
+    }
+    
+    const avatarLabel = document.getElementById('avatarLabel');
+    if (avatarLabel) {
+        avatarLabel.textContent = t('selectAvatar') || 'Avatar Seç';
+    }
+    
+    const cancelBtn = document.getElementById('cancelBtn');
+    if (cancelBtn) {
+        cancelBtn.textContent = t('cancel') || 'İptal';
+    }
+    
+    const saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) {
+        saveBtn.textContent = t('save') || 'Kaydet';
+    }
+}
+
+function showSuccessMessage(message) {
+    const successMsg = document.createElement('div');
+    successMsg.innerHTML = message;
+    successMsg.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #48bb78;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        z-index: 1001;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+    `;
+    document.body.appendChild(successMsg);
+    
+    setTimeout(() => {
+        successMsg.remove();
+    }, 3000);
 }
 
 // Test notification function
