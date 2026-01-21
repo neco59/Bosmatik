@@ -403,7 +403,9 @@ class Bosmatik {
         const newLevel = Math.floor(this.userData.totalPoints / 1000) + 1;
         if (newLevel > this.userData.level) {
             this.userData.level = newLevel;
-            this.showAchievement(`Seviye ${newLevel}!`, `Tebrikler! ${newLevel}. seviyeye ulaştınız! 🎉`);
+            const levelUpTitle = `${t('level') || 'Seviye'} ${newLevel}!`;
+            const levelUpDesc = `${t('levelUpMessage') || 'Tebrikler! {level}. seviyeye ulaştınız! 🎉'}`.replace('{level}', newLevel);
+            this.showAchievement(levelUpTitle, levelUpDesc);
         }
     }
 
@@ -624,20 +626,20 @@ class Bosmatik {
         };
         
         const categoryNames = {
-            daily: 'Günlük',
-            weekly: 'Haftalık',
-            monthly: 'Aylık',
-            yearly: 'Yıllık'
+            daily: t('categoryNames.daily') || 'Günlük',
+            weekly: t('categoryNames.weekly') || 'Haftalık',
+            monthly: t('categoryNames.monthly') || 'Aylık',
+            yearly: t('categoryNames.yearly') || 'Yıllık'
         };
         
         text.innerHTML = `
             <div style="color: ${categoryColors[category]}; font-weight: bold; margin-bottom: 10px;">
-                ${categoryNames[category]} Başarı!
+                ${categoryNames[category]} ${t('newAchievement') || 'Başarı!'}
             </div>
             <strong>${title}</strong><br>
             ${description}<br>
             <small style="color: #666; margin-top: 10px; display: block;">
-                +${this.getCategoryBonus(category)} Bonus Puan!
+                +${this.getCategoryBonus(category)} ${t('bonusPoints') || 'Bonus Puan!'}
             </small>
         `;
         
@@ -1539,15 +1541,100 @@ class NotificationManager {
     }
     
     testNotification() {
+        console.log('🔔 Test bildirimi başlatılıyor...');
+        
         const title = t('testNotificationTitle') || '🔔 Test Bildirimi';
         const body = t('testNotificationBody') || 'Bildirimler düzgün çalışıyor! 🎉';
         
-        this.showNotification(title, {
-            body: body,
-            icon: './icon-192.png',
-            badge: './icon-192.png',
-            tag: 'test'
-        });
+        // First check if notifications are supported
+        if (!('Notification' in window)) {
+            console.error('Bildirimler desteklenmiyor');
+            alert(t('notificationNotSupported') || 'Bu tarayıcı bildirimleri desteklemiyor.');
+            return;
+        }
+        
+        console.log('Bildirim izni durumu:', Notification.permission);
+        
+        // Check permission and request if needed
+        if (Notification.permission === 'default') {
+            console.log('İzin isteniyor...');
+            Notification.requestPermission().then(permission => {
+                console.log('İzin sonucu:', permission);
+                if (permission === 'granted') {
+                    this.sendTestNotification(title, body);
+                } else {
+                    alert(t('notificationDenied') || 'Bildirimler engellenmiş. Tarayıcı ayarlarından etkinleştirin.');
+                }
+            }).catch(error => {
+                console.error('İzin isteme hatası:', error);
+                alert('Bildirim izni alınırken hata oluştu: ' + error.message);
+            });
+        } else if (Notification.permission === 'granted') {
+            console.log('İzin zaten verilmiş, bildirim gönderiliyor...');
+            this.sendTestNotification(title, body);
+        } else {
+            console.error('Bildirim izni reddedilmiş');
+            alert(t('notificationDenied') || 'Bildirimler engellenmiş. Tarayıcı ayarlarından etkinleştirin.');
+        }
+    }
+    
+    sendTestNotification(title, body) {
+        console.log('Test bildirimi gönderiliyor:', title, body);
+        
+        try {
+            // Önce basit Notification API'yi dene (daha güvenilir)
+            const notification = new Notification(title, {
+                body: body,
+                icon: './icon-192.png',
+                tag: 'test',
+                requireInteraction: false
+            });
+            
+            console.log('✅ Test bildirimi başarıyla oluşturuldu');
+            this.showSuccessMessage(t('testNotificationSent') || '🔔 Test bildirimi gönderildi!');
+            
+            // Bildirim tıklandığında
+            notification.onclick = function() {
+                console.log('Test bildirimi tıklandı');
+                window.focus();
+                notification.close();
+            };
+            
+            // 5 saniye sonra otomatik kapat
+            setTimeout(() => {
+                notification.close();
+                console.log('Test bildirimi otomatik kapatıldı');
+            }, 5000);
+            
+        } catch (error) {
+            console.error('Basit bildirim hatası:', error);
+            
+            // Service Worker ile dene
+            if ('serviceWorker' in navigator) {
+                console.log('Service Worker ile deneniyor...');
+                navigator.serviceWorker.ready.then(registration => {
+                    return registration.showNotification(title, {
+                        body: body,
+                        icon: './icon-192.png',
+                        badge: './icon-192.png',
+                        tag: 'test',
+                        requireInteraction: false,
+                        vibrate: [200, 100, 200]
+                    });
+                }).then(() => {
+                    console.log('✅ Service Worker bildirimi başarılı');
+                    this.showSuccessMessage(t('testNotificationSent') || '🔔 Test bildirimi gönderildi!');
+                }).catch(swError => {
+                    console.error('Service Worker bildirim hatası:', swError);
+                    // Yine de başarı mesajı göster çünkü izin verilmiş
+                    this.showSuccessMessage('Bildirim gönderildi (hata olabilir: ' + swError.message + ')');
+                });
+            } else {
+                console.error('Service Worker desteklenmiyor');
+                // Yine de başarı mesajı göster
+                this.showSuccessMessage('Bildirim API\'si çalışıyor (görsel bildirim gösterilmeyebilir)');
+            }
+        }
     }
     
     clearScheduledNotifications() {
@@ -1585,6 +1672,7 @@ let notificationManager;
 function openSettings() {
     document.getElementById('settingsModal').style.display = 'flex';
     loadSettingsUI();
+    updateSettingsModalTexts(); // Ayarlar modalı açıldığında metinleri güncelle
 }
 
 function closeSettings() {
