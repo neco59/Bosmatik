@@ -312,6 +312,9 @@ class Bosmatik {
             this.updateLeaderboard(boşScore);
             this.createChart(activities);
             
+            // Firebase entegrasyonu
+            updateFirebaseLeaderboard(boşScore, activities);
+            
             console.log('✅ Hesaplama tamamlandı!');
             
             // Sonuçları göster
@@ -1745,9 +1748,137 @@ function updateSoundEffects() {
     notificationManager.saveSettings();
 }
 
-function testNotification() {
-    if (!notificationManager) return;
-    notificationManager.testNotification();
+// Firebase Login Functions
+async function loginWithGoogle() {
+    try {
+        const user = await window.firebaseService.loginWithGoogle();
+        console.log('Google giriş başarılı:', user.displayName);
+    } catch (error) {
+        console.error('Google giriş hatası:', error);
+        alert('Google girişi başarısız: ' + error.message);
+    }
+}
+
+async function loginAnonymously() {
+    try {
+        const user = await window.firebaseService.loginAnonymously();
+        console.log('Anonim giriş başarılı:', user.uid);
+    } catch (error) {
+        console.error('Anonim giriş hatası:', error);
+        alert('Anonim giriş başarısız: ' + error.message);
+    }
+}
+
+async function logout() {
+    try {
+        await window.firebaseService.logout();
+    } catch (error) {
+        console.error('Çıkış hatası:', error);
+    }
+}
+
+// Firebase Leaderboard Integration
+async function updateFirebaseLeaderboard(score, activities) {
+    if (!window.firebaseService || !window.firebaseService.currentUser) {
+        console.log('Firebase kullanıcısı yok, yerel sıralama kullanılıyor');
+        return;
+    }
+
+    try {
+        const scoreData = {
+            score: score,
+            points: Math.floor(score * 10),
+            activities: activities
+        };
+
+        await window.firebaseService.submitScore(scoreData);
+        console.log('✅ Firebase skorları güncellendi');
+        
+        // Gerçek sıralamayı yükle
+        await loadFirebaseLeaderboard();
+    } catch (error) {
+        console.error('Firebase skor gönderme hatası:', error);
+    }
+}
+
+async function loadFirebaseLeaderboard() {
+    if (!window.firebaseService) {
+        console.log('Firebase servisi yok');
+        return;
+    }
+
+    try {
+        const dailyLeaderboard = await window.firebaseService.getLeaderboard('daily', 10);
+        const alltimeLeaderboard = await window.firebaseService.getLeaderboard('alltime', 10);
+        
+        displayFirebaseLeaderboard(dailyLeaderboard, alltimeLeaderboard);
+    } catch (error) {
+        console.error('Firebase sıralama yükleme hatası:', error);
+    }
+}
+
+function displayFirebaseLeaderboard(dailyLeaderboard, alltimeLeaderboard) {
+    const leaderboardContainer = document.getElementById('leaderboardList');
+    if (!leaderboardContainer) return;
+
+    let html = '<div class="leaderboard-tabs">';
+    html += '<button class="tab-btn active" onclick="showLeaderboardTab(\'daily\')">📅 Günlük</button>';
+    html += '<button class="tab-btn" onclick="showLeaderboardTab(\'alltime\')">🏆 Tüm Zamanlar</button>';
+    html += '</div>';
+
+    // Daily Leaderboard
+    html += '<div id="dailyLeaderboard" class="leaderboard-content">';
+    if (dailyLeaderboard.length > 0) {
+        dailyLeaderboard.forEach((user, index) => {
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+            html += `
+                <div class="leaderboard-item ${index < 3 ? 'top-three' : ''}">
+                    <div class="rank">${medal}</div>
+                    <div class="user-info">
+                        ${user.photoURL ? `<img src="${user.photoURL}" alt="Avatar" class="user-avatar-small">` : '👤'}
+                        <span class="username">${user.displayName}</span>
+                    </div>
+                    <div class="score">${user.score.toFixed(1)} puan</div>
+                </div>
+            `;
+        });
+    } else {
+        html += '<div class="no-data">Henüz günlük skor yok</div>';
+    }
+    html += '</div>';
+
+    // All Time Leaderboard
+    html += '<div id="alltimeLeaderboard" class="leaderboard-content" style="display: none;">';
+    if (alltimeLeaderboard.length > 0) {
+        alltimeLeaderboard.forEach((user, index) => {
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+            html += `
+                <div class="leaderboard-item ${index < 3 ? 'top-three' : ''}">
+                    <div class="rank">${medal}</div>
+                    <div class="user-info">
+                        ${user.photoURL ? `<img src="${user.photoURL}" alt="Avatar" class="user-avatar-small">` : '👤'}
+                        <span class="username">${user.displayName}</span>
+                    </div>
+                    <div class="score">Seviye ${user.level} • ${user.totalPoints.toLocaleString()} puan</div>
+                </div>
+            `;
+        });
+    } else {
+        html += '<div class="no-data">Henüz kullanıcı yok</div>';
+    }
+    html += '</div>';
+
+    leaderboardContainer.innerHTML = html;
+}
+
+function showLeaderboardTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Show/hide content
+    document.getElementById('dailyLeaderboard').style.display = tab === 'daily' ? 'block' : 'none';
+    document.getElementById('alltimeLeaderboard').style.display = tab === 'alltime' ? 'block' : 'none';
 }
 
 // Initialize notification manager
