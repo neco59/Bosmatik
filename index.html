@@ -348,6 +348,59 @@
                 </div>
             </div>
         </div>
+
+        <!-- Profile Edit Modal -->
+        <div class="profile-modal" id="profileModal" style="display: none;">
+            <div class="profile-content">
+                <div class="profile-header">
+                    <h3 id="profileTitle">👤 Profil Düzenle</h3>
+                    <button class="close-btn" onclick="closeProfile()">✕</button>
+                </div>
+                
+                <div class="profile-body">
+                    <!-- Current Profile -->
+                    <div class="current-profile">
+                        <div class="current-avatar" id="currentAvatar">👤</div>
+                        <div class="current-name" id="currentName">Kullanıcı Adı</div>
+                    </div>
+                    
+                    <!-- Edit Form -->
+                    <div class="profile-form">
+                        <div class="form-group">
+                            <label for="displayName" id="displayNameLabel">Görünen İsim</label>
+                            <input type="text" id="displayName" placeholder="Kullanıcı adınızı girin" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="avatarLabel">Avatar Seç</label>
+                            <div class="avatar-grid">
+                                <div class="avatar-option" data-avatar="👤" onclick="selectAvatar('👤')">👤</div>
+                                <div class="avatar-option" data-avatar="😊" onclick="selectAvatar('😊')">😊</div>
+                                <div class="avatar-option" data-avatar="😎" onclick="selectAvatar('😎')">😎</div>
+                                <div class="avatar-option" data-avatar="🤓" onclick="selectAvatar('🤓')">🤓</div>
+                                <div class="avatar-option" data-avatar="😴" onclick="selectAvatar('😴')">😴</div>
+                                <div class="avatar-option" data-avatar="🤪" onclick="selectAvatar('🤪')">🤪</div>
+                                <div class="avatar-option" data-avatar="🥳" onclick="selectAvatar('🥳')">🥳</div>
+                                <div class="avatar-option" data-avatar="🤖" onclick="selectAvatar('🤖')">🤖</div>
+                                <div class="avatar-option" data-avatar="👻" onclick="selectAvatar('👻')">👻</div>
+                                <div class="avatar-option" data-avatar="🦄" onclick="selectAvatar('🦄')">🦄</div>
+                                <div class="avatar-option" data-avatar="🐱" onclick="selectAvatar('🐱')">🐱</div>
+                                <div class="avatar-option" data-avatar="🐶" onclick="selectAvatar('🐶')">🐶</div>
+                                <div class="avatar-option" data-avatar="🦊" onclick="selectAvatar('🦊')">🦊</div>
+                                <div class="avatar-option" data-avatar="🐼" onclick="selectAvatar('🐼')">🐼</div>
+                                <div class="avatar-option" data-avatar="🦁" onclick="selectAvatar('🦁')">🦁</div>
+                                <div class="avatar-option" data-avatar="🐸" onclick="selectAvatar('🐸')">🐸</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="profile-btn secondary" onclick="closeProfile()" id="cancelBtn">İptal</button>
+                            <button class="profile-btn primary" onclick="saveProfile()" id="saveBtn">Kaydet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="translations.js"></script>
