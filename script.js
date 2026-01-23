@@ -2,10 +2,23 @@ class Bosmatik {
     constructor() {
         this.userData = this.loadUserData();
         this.achievements = this.initializeAchievements();
-        this.leaderboardData = this.loadLeaderboard();
+        this.leaderboardData = []; // Başlangıçta boş, async yüklenecek
         this.initializeEventListeners();
         this.updateUserStats();
         this.generateDailyTip();
+        
+        // Leaderboard'u async yükle
+        this.initializeLeaderboard();
+    }
+    
+    async initializeLeaderboard() {
+        try {
+            this.leaderboardData = await this.loadLeaderboard();
+            this.displayLeaderboard();
+            console.log('✅ Leaderboard başlatıldı');
+        } catch (error) {
+            console.error('❌ Leaderboard başlatma hatası:', error);
+        }
     }
 
     initializeEventListeners() {
@@ -757,7 +770,10 @@ class Bosmatik {
         });
     }
 
-    loadLeaderboard() {
+    async loadLeaderboard() {
+        console.log('📊 Leaderboard yükleniyor...');
+        
+        // Varsayılan sahte veriler (Firebase bağlantısı yoksa)
         const defaultLeaderboard = [
             { name: 'Sen', score: 0, isUser: true },
             { name: 'Ahmet', score: 15.5 },
@@ -768,8 +784,58 @@ class Bosmatik {
             { name: 'Zeynep', score: 7.8 }
         ];
         
-        const saved = localStorage.getItem('bosmatik-leaderboard');
-        return saved ? JSON.parse(saved) : defaultLeaderboard;
+        try {
+            // Firebase'den gerçek leaderboard verilerini çek
+            if (window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser) {
+                console.log('🔥 Firebase\'den leaderboard çekiliyor...');
+                
+                const leaderboardRef = window.firebaseDb.collection('leaderboard')
+                    .orderBy('score', 'desc')
+                    .limit(10);
+                
+                const snapshot = await leaderboardRef.get();
+                const firebaseLeaderboard = [];
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    firebaseLeaderboard.push({
+                        name: data.displayName || 'Anonim Kullanıcı',
+                        score: data.score || 0,
+                        isUser: doc.id === window.firebaseAuth.currentUser.uid,
+                        uid: doc.id,
+                        timestamp: data.timestamp
+                    });
+                });
+                
+                // Eğer mevcut kullanıcı listede yoksa ekle
+                const currentUser = window.firebaseAuth.currentUser;
+                const userExists = firebaseLeaderboard.some(entry => entry.uid === currentUser.uid);
+                
+                if (!userExists) {
+                    firebaseLeaderboard.push({
+                        name: currentUser.displayName || 'Sen',
+                        score: 0,
+                        isUser: true,
+                        uid: currentUser.uid
+                    });
+                }
+                
+                // Skora göre tekrar sırala
+                firebaseLeaderboard.sort((a, b) => b.score - a.score);
+                
+                console.log('✅ Firebase leaderboard yüklendi:', firebaseLeaderboard.length, 'kullanıcı');
+                return firebaseLeaderboard;
+                
+            } else {
+                console.log('⚠️ Firebase bağlantısı yok, sahte veriler kullanılıyor');
+                return defaultLeaderboard;
+            }
+            
+        } catch (error) {
+            console.error('❌ Firebase leaderboard hatası:', error);
+            console.log('🔄 Sahte verilere geri dönülüyor');
+            return defaultLeaderboard;
+        }
     }
 
     updateLeaderboard(userScore) {
@@ -1402,10 +1468,56 @@ class NotificationManager {
             try {
                 const registration = await navigator.serviceWorker.ready;
                 console.log('🔔 Service Worker hazır, bildirimler aktif');
+                
+                // Otomatik bildirim izni iste (ilk kez gelenlere)
+                if (Notification.permission === 'default') {
+                    console.log('🔔 İlk kez gelen kullanıcı, bildirim izni isteniyor...');
+                    setTimeout(() => {
+                        this.requestPermissionWithPrompt();
+                    }, 5000); // 5 saniye sonra sor
+                }
+                
             } catch (error) {
                 console.error('Service Worker hatası:', error);
             }
         }
+    }
+    
+    async requestPermissionWithPrompt() {
+        // Kullanıcı dostu bildirim izni isteme
+        const userWantsNotifications = confirm(
+            '🔔 Günlük hatırlatma bildirimleri almak ister misiniz?\n\n' +
+            '• Her akşam saat 20:00\'da hatırlatma\n' +
+            '• Başarı bildirimleri\n' +
+            '• Haftalık raporlar\n\n' +
+            'İstediğiniz zaman ayarlardan kapatabilirsiniz.'
+        );
+        
+        if (userWantsNotifications) {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                this.settings.enabled = true;
+                this.saveSettings();
+                this.scheduleDailyReminder();
+                console.log('✅ Bildirimler etkinleştirildi!');
+                
+                // Hoş geldin bildirimi gönder
+                setTimeout(() => {
+                    this.sendWelcomeNotification();
+                }, 2000);
+            }
+        }
+    }
+    
+    sendWelcomeNotification() {
+        const title = '🎉 Hoş Geldin!';
+        const body = 'Bildirimler aktif! Her akşam saat 20:00\'da hatırlatma alacaksın.';
+        
+        this.showNotification(title, {
+            body: body,
+            icon: './icon-192.png',
+            tag: 'welcome'
+        });
     }
     
     async requestPermission() {
@@ -1473,8 +1585,20 @@ class NotificationManager {
     sendDailyReminder() {
         if (!this.settings.enabled) return;
         
-        const title = t('dailyReminderTitle') || '🎮 Boşmatik';
-        const body = t('dailyReminderBody') || 'Bugün ne kadar boş yaptın? Hemen kontrol et!';
+        // Çekici mesajlar listesi
+        const messages = [
+            'Bugün ne kadar boş yaptın? 🤔 Hemen kontrol et!',
+            'Günlük boş yapma seviyeni öğrenme zamanı! 🎯',
+            'Arkadaşlarınla yarışmaya devam et! 🏆',
+            'Bugünkü TikTok maratonu nasıldı? 📱',
+            'Boş yapma skorunu güncelleme zamanı! ⏰',
+            'Günlük başarılarını kontrol et! 🎖️'
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        const title = '🎮 Boşmatik Hatırlatması';
+        const body = randomMessage;
         
         this.showNotification(title, {
             body: body,
@@ -1482,17 +1606,20 @@ class NotificationManager {
             badge: './icon-192.png',
             tag: 'daily-reminder',
             requireInteraction: false,
+            vibrate: [200, 100, 200], // Titreşim deseni
             actions: [
                 {
                     action: 'open',
-                    title: t('openApp') || 'Uygulamayı Aç'
+                    title: '🎯 Skorumu Gir'
                 },
                 {
                     action: 'dismiss',
-                    title: t('dismiss') || 'Kapat'
+                    title: '❌ Kapat'
                 }
             ]
         });
+        
+        console.log('📢 Günlük hatırlatma gönderildi:', body);
     }
     
     sendAchievementNotification(achievementName, achievementDesc) {
