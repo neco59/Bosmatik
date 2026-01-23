@@ -197,6 +197,14 @@ function initializeFirebase() {
         auth.onAuthStateChanged(function(user) {
             console.log('� Auth durumu değişti:', user ? user.uid : 'çıkış');
             updateAuthUI(user);
+            
+            // Kullanıcı giriş yaptığında leaderboard'u yenile
+            if (user && window.bosmatikApp) {
+                console.log('👤 Kullanıcı giriş yaptı, leaderboard yenileniyor...');
+                setTimeout(() => {
+                    window.bosmatikApp.initializeLeaderboard();
+                }, 2000);
+            }
         });
         
         // Make functions global
