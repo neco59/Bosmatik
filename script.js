@@ -13,9 +13,35 @@ class Bosmatik {
     
     async initializeLeaderboard() {
         try {
-            this.leaderboardData = await this.loadLeaderboard();
+            // İlk olarak boş leaderboard göster
+            this.leaderboardData = [];
             this.displayLeaderboard();
-            console.log('✅ Leaderboard başlatıldı');
+            
+            // Firebase hazır olana kadar bekle
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            const waitForFirebase = async () => {
+                attempts++;
+                console.log(`🔥 Firebase bekleniyor... Deneme ${attempts}/${maxAttempts}`);
+                
+                if (window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser) {
+                    console.log('✅ Firebase hazır, leaderboard yükleniyor...');
+                    this.leaderboardData = await this.loadLeaderboard();
+                    this.displayLeaderboard();
+                    return true;
+                } else if (attempts < maxAttempts) {
+                    // 2 saniye bekle ve tekrar dene
+                    setTimeout(waitForFirebase, 2000);
+                    return false;
+                } else {
+                    console.log('⚠️ Firebase bağlantısı kurulamadı, boş leaderboard gösteriliyor');
+                    return false;
+                }
+            };
+            
+            await waitForFirebase();
+            
         } catch (error) {
             console.error('❌ Leaderboard başlatma hatası:', error);
         }
@@ -773,17 +799,6 @@ class Bosmatik {
     async loadLeaderboard() {
         console.log('📊 Leaderboard yükleniyor...');
         
-        // Varsayılan sahte veriler (Firebase bağlantısı yoksa)
-        const defaultLeaderboard = [
-            { name: 'Sen', score: 0, isUser: true },
-            { name: 'Ahmet', score: 15.5 },
-            { name: 'Ayşe', score: 12.3 },
-            { name: 'Mehmet', score: 18.7 },
-            { name: 'Fatma', score: 9.2 },
-            { name: 'Ali', score: 22.1 },
-            { name: 'Zeynep', score: 7.8 }
-        ];
-        
         try {
             // Firebase'den gerçek leaderboard verilerini çek
             if (window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser) {
@@ -827,14 +842,15 @@ class Bosmatik {
                 return firebaseLeaderboard;
                 
             } else {
-                console.log('⚠️ Firebase bağlantısı yok, sahte veriler kullanılıyor');
-                return defaultLeaderboard;
+                console.log('⚠️ Firebase bağlantısı yok veya kullanıcı giriş yapmamış');
+                // Firebase yoksa boş array döndür
+                return [];
             }
             
         } catch (error) {
             console.error('❌ Firebase leaderboard hatası:', error);
-            console.log('🔄 Sahte verilere geri dönülüyor');
-            return defaultLeaderboard;
+            console.log('🔄 Boş leaderboard döndürülüyor');
+            return [];
         }
     }
 
@@ -879,12 +895,14 @@ class Bosmatik {
         const list = document.getElementById('leaderboardList');
         list.innerHTML = '';
         
-        // Eğer leaderboard verisi yoksa loading göster
+        // Eğer leaderboard verisi yoksa uygun mesaj göster
         if (!this.leaderboardData || this.leaderboardData.length === 0) {
             list.innerHTML = `
-                <div class="leaderboard-loading">
-                    <div style="text-align: center; padding: 20px; color: #666;">
-                        🔄 Sıralama yükleniyor...
+                <div class="leaderboard-empty">
+                    <div style="text-align: center; padding: 30px; color: #666;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🏆</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Henüz kimse skor girmemiş!</div>
+                        <div style="font-size: 0.9rem;">İlk skor giren sen ol! 🎯</div>
                     </div>
                 </div>
             `;
@@ -900,15 +918,16 @@ class Bosmatik {
             else if (index === 1) rankClass = 'silver';
             else if (index === 2) rankClass = 'bronze';
             
-            // Firebase'den gelen gerçek veri mi kontrol et
-            const isRealData = entry.uid || entry.timestamp;
-            const nameDisplay = isRealData ? entry.name : `${entry.name} 🤖`;
+            // Firebase'den gelen gerçek veri (uid varsa gerçek)
+            const isRealData = entry.uid;
+            const nameDisplay = entry.name;
             
             item.innerHTML = `
                 <div class="rank ${rankClass}">${index + 1}</div>
                 <div class="player-info">
                     <div class="player-name">${nameDisplay} ${entry.isUser ? '(Sen)' : ''}</div>
                     <div class="player-score">${entry.score.toFixed(1)} boş puan</div>
+                    ${isRealData ? '<div class="real-user">👤 Gerçek kullanıcı</div>' : ''}
                 </div>
             `;
             
