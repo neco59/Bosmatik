@@ -377,7 +377,7 @@ function changeLanguage(lang) {
     // Update settings modal if it's open
     const settingsModal = document.getElementById('settingsModal');
     if (settingsModal && settingsModal.style.display === 'flex') {
-        updateSettingsTexts();
+        updateSettingsModalTexts();
     }
     
     // Başarıları yeniden göster
@@ -388,6 +388,18 @@ function changeLanguage(lang) {
     
     // Update language buttons
     updateLanguageButtons();
+}
+
+// Dil butonlarını güncelle
+function updateLanguageButtons() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const activeBtn = document.getElementById(`lang-${currentLanguage}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
 }
 
 // Sayfa metinlerini güncelle
@@ -402,44 +414,75 @@ function updatePageTexts() {
     document.querySelectorAll('.stat-label')[2].textContent = t('dailyStreak');
     
     // Main title
-    document.querySelector('.input-section h2').textContent = t('mainTitle');
+    const mainTitle = document.querySelector('.input-section h2');
+    if (mainTitle) {
+        mainTitle.textContent = currentLanguage === 'en' ? '📱 How Much Did You Waste Today?' : '📱 Bugün Ne Kadar Boş Yaptın?';
+    }
     
     // Activity group titles
-    document.querySelector('.social-media h3').textContent = t('socialMediaTitle');
-    document.querySelector('.entertainment h3').textContent = t('entertainmentTitle');
-    document.querySelector('.productive h3').textContent = t('productiveTitle');
+    const socialMediaTitle = document.querySelector('.social-media h3');
+    if (socialMediaTitle) {
+        socialMediaTitle.textContent = currentLanguage === 'en' ? '🔥 Social Media & Entertainment' : '🔥 Sosyal Medya & Eğlence';
+    }
     
-    // Activity labels
-    const activities = [
-        'instagram', 'tiktok', 'youtube', 'twitter', 'facebook', 'twitch',
-        'discord', 'snapchat', 'linkedin', 'reddit', 'netflix', 'games',
-        'spotify', 'random', 'shopping', 'whatsapp', 'telegram', 'reading',
-        'exercise', 'learning'
-    ];
+    const entertainmentTitle = document.querySelector('.entertainment h3');
+    if (entertainmentTitle) {
+        entertainmentTitle.textContent = currentLanguage === 'en' ? '🎯 Other Idle Activities' : '🎯 Diğer Boş Aktiviteler';
+    }
     
-    activities.forEach(activity => {
+    const productiveTitle = document.querySelector('.productive h3');
+    if (productiveTitle) {
+        productiveTitle.textContent = currentLanguage === 'en' ? '💪 Productive Activities (Reduces Points)' : '💪 Üretken Aktiviteler (Puan Azaltır)';
+    }
+    
+    // Activity labels - Update by finding the text content
+    const activityMappings = {
+        'instagram': { tr: '📸 Instagram:', en: '📸 Instagram:' },
+        'tiktok': { tr: '🎵 TikTok:', en: '🎵 TikTok:' },
+        'youtube': { tr: '📺 YouTube:', en: '📺 YouTube:' },
+        'twitter': { tr: '🐦 Twitter/X:', en: '🐦 Twitter/X:' },
+        'facebook': { tr: '👥 Facebook:', en: '👥 Facebook:' },
+        'twitch': { tr: '🎮 Twitch:', en: '🎮 Twitch:' },
+        'discord': { tr: '💬 Discord:', en: '💬 Discord:' },
+        'snapchat': { tr: '👻 Snapchat:', en: '👻 Snapchat:' },
+        'linkedin': { tr: '💼 LinkedIn:', en: '💼 LinkedIn:' },
+        'reddit': { tr: '🤖 Reddit:', en: '🤖 Reddit:' },
+        'netflix': { tr: '🍿 Dizi/Film İzleme:', en: '🍿 TV Shows/Movies:' },
+        'games': { tr: '🎮 Oyun:', en: '🎮 Gaming:' },
+        'spotify': { tr: '🎵 Müzik Dinleme:', en: '🎵 Music Listening:' },
+        'random': { tr: '🤷‍♂️ Rastgele Gezinme:', en: '🤷‍♂️ Random Browsing:' },
+        'shopping': { tr: '🛒 Online Alışveriş:', en: '🛒 Online Shopping:' },
+        'whatsapp': { tr: '📱 Anlık Mesajlaşma:', en: '📱 Instant Messaging:' },
+        'telegram': { tr: '✈️ Mesajlaşma:', en: '✈️ Messaging:' },
+        'reading': { tr: '📚 Kitap Okuma:', en: '📚 Book Reading:' },
+        'exercise': { tr: '🏃‍♂️ Spor:', en: '🏃‍♂️ Exercise:' },
+        'learning': { tr: '🎓 Öğrenme/Kurs:', en: '🎓 Learning/Course:' }
+    };
+    
+    // Update activity labels
+    Object.keys(activityMappings).forEach(activity => {
         const label = document.querySelector(`label[for="${activity}"]`);
-        if (label) {
-            label.textContent = t(activity);
+        if (label && activityMappings[activity][currentLanguage]) {
+            label.textContent = activityMappings[activity][currentLanguage];
         }
     });
     
-    // Time unit
+    // Time unit - Update "saat" to "hours" for English
     document.querySelectorAll('.input-row span').forEach(span => {
         if (span.textContent.trim() === 'saat' || span.textContent.trim() === 'hours') {
-            span.textContent = t('hours');
+            span.textContent = currentLanguage === 'en' ? 'hours' : 'saat';
         }
     });
     
     // Buttons
     const calculateBtn = document.querySelector('.btn-text');
     if (calculateBtn) {
-        calculateBtn.textContent = t('calculateBtn');
+        calculateBtn.textContent = currentLanguage === 'en' ? 'Calculate My Waste Level!' : 'Boş Yapma Seviyemi Hesapla!';
     }
     
     const newDayBtn = document.querySelector('.reset-btn-inline');
     if (newDayBtn) {
-        newDayBtn.textContent = t('newDayBtn');
+        newDayBtn.textContent = currentLanguage === 'en' ? '🌅 Start New Day' : '🌅 Yeni Gün Başlat';
     }
     
     // Results section
