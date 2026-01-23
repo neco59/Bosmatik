@@ -29,8 +29,8 @@
         <header>
             <div class="language-selector">
                 <button class="settings-btn" onclick="window.openSettings ? window.openSettings() : console.error('openSettings not available')" id="settingsBtn">⚙️</button>
-                <button class="lang-btn active" onclick="changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
-                <button class="lang-btn" onclick="changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
+                <button class="lang-btn active" onclick="window.changeLanguage ? window.changeLanguage('tr') : changeLanguage('tr')" id="lang-tr">🇹🇷 TR</button>
+                <button class="lang-btn" onclick="window.changeLanguage ? window.changeLanguage('en') : changeLanguage('en')" id="lang-en">🇺🇸 EN</button>
             </div>
 
             <!-- Login Section -->
