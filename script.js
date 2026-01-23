@@ -838,25 +838,58 @@ class Bosmatik {
         }
     }
 
-    updateLeaderboard(userScore) {
-        // Kullanıcının skorunu güncelle
-        const userEntry = this.leaderboardData.find(entry => entry.isUser);
-        if (userEntry) {
-            userEntry.score = userScore;
-        }
+    async updateLeaderboard(userScore) {
+        console.log('📊 Leaderboard güncelleniyor, skor:', userScore);
         
-        // Sırala
-        this.leaderboardData.sort((a, b) => b.score - a.score);
+        // Önce Firebase'e kaydet
+        try {
+            if (window.firebaseAuth && window.firebaseAuth.currentUser && window.firebaseDb) {
+                await updateFirebaseLeaderboard(userScore, {});
+                console.log('✅ Firebase leaderboard güncellendi');
+                
+                // Firebase'den fresh data çek
+                this.leaderboardData = await this.loadLeaderboard();
+            } else {
+                console.log('⚠️ Firebase bağlantısı yok, local güncelleme yapılıyor');
+                // Kullanıcının skorunu güncelle (fallback)
+                const userEntry = this.leaderboardData.find(entry => entry.isUser);
+                if (userEntry) {
+                    userEntry.score = userScore;
+                }
+                
+                // Sırala
+                this.leaderboardData.sort((a, b) => b.score - a.score);
+            }
+        } catch (error) {
+            console.error('❌ Leaderboard güncelleme hatası:', error);
+            
+            // Hata durumunda local güncelleme yap
+            const userEntry = this.leaderboardData.find(entry => entry.isUser);
+            if (userEntry) {
+                userEntry.score = userScore;
+            }
+            this.leaderboardData.sort((a, b) => b.score - a.score);
+        }
         
         // Leaderboard'u göster
         this.displayLeaderboard();
-        
-        localStorage.setItem('bosmatik-leaderboard', JSON.stringify(this.leaderboardData));
     }
 
     displayLeaderboard() {
         const list = document.getElementById('leaderboardList');
         list.innerHTML = '';
+        
+        // Eğer leaderboard verisi yoksa loading göster
+        if (!this.leaderboardData || this.leaderboardData.length === 0) {
+            list.innerHTML = `
+                <div class="leaderboard-loading">
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        🔄 Sıralama yükleniyor...
+                    </div>
+                </div>
+            `;
+            return;
+        }
         
         this.leaderboardData.slice(0, 7).forEach((entry, index) => {
             const item = document.createElement('div');
@@ -867,10 +900,14 @@ class Bosmatik {
             else if (index === 1) rankClass = 'silver';
             else if (index === 2) rankClass = 'bronze';
             
+            // Firebase'den gelen gerçek veri mi kontrol et
+            const isRealData = entry.uid || entry.timestamp;
+            const nameDisplay = isRealData ? entry.name : `${entry.name} 🤖`;
+            
             item.innerHTML = `
                 <div class="rank ${rankClass}">${index + 1}</div>
                 <div class="player-info">
-                    <div class="player-name">${entry.name} ${entry.isUser ? '(Sen)' : ''}</div>
+                    <div class="player-name">${nameDisplay} ${entry.isUser ? '(Sen)' : ''}</div>
                     <div class="player-score">${entry.score.toFixed(1)} boş puan</div>
                 </div>
             `;
@@ -882,6 +919,8 @@ class Bosmatik {
             
             list.appendChild(item);
         });
+        
+        console.log('📊 Leaderboard görüntülendi:', this.leaderboardData.length, 'kullanıcı');
     }
 
     generateDailyTip() {
@@ -977,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.bosmatikApp = new Bosmatik();
     window.bosmatikApp.loadInputData();
     window.bosmatikApp.displayAchievements();
-    window.bosmatikApp.displayLeaderboard();
+    // window.bosmatikApp.displayLeaderboard(); // REMOVED - Firebase'den async yüklenecek
     
     // Modal event listeners - removed import functionality
 });
@@ -1925,27 +1964,23 @@ async function updateFirebaseLeaderboard(score, activities) {
         }
 
         const user = window.firebaseAuth.currentUser;
-        const today = new Date().toDateString();
         
         const leaderboardData = {
             uid: user.uid,
             displayName: user.displayName || 'Anonim Kullanıcı',
             photoURL: user.photoURL || null,
             score: score,
-            date: today,
-            timestamp: Date.now(),
-            activities: activities
+            timestamp: new Date(),
+            activities: activities,
+            lastUpdated: Date.now()
         };
 
-        // Update daily leaderboard
+        // Update user's leaderboard entry (overwrite previous score)
         await window.firebaseDb.collection('leaderboard')
-            .doc(`${today}_${user.uid}`)
+            .doc(user.uid)
             .set(leaderboardData);
 
-        console.log('✅ Firebase leaderboard updated:', score);
-        
-        // Load updated leaderboard
-        loadFirebaseLeaderboard();
+        console.log('✅ Firebase leaderboard updated for user:', user.displayName, 'Score:', score);
         
     } catch (error) {
         console.error('❌ Firebase leaderboard update error:', error);
@@ -2070,33 +2105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
-
-// Firebase Leaderboard Integration
-async function updateFirebaseLeaderboard(score, activities) {
-    try {
-        if (!window.firebaseAuth || !window.firebaseAuth.currentUser || !window.firebaseDb) {
-            console.log('Firebase henüz hazır değil, leaderboard güncellenemiyor');
-            return;
-        }
-
-        const user = window.firebaseAuth.currentUser;
-        const userData = {
-            uid: user.uid,
-            displayName: user.displayName || 'Anonim Kullanıcı',
-            photoURL: user.photoURL || null,
-            score: score,
-            timestamp: new Date(),
-            activities: activities
-        };
-
-        // Firestore'a kaydet
-        await window.firebaseDb.collection('leaderboard').doc(user.uid).set(userData);
-        console.log('✅ Firebase leaderboard güncellendi');
-
-    } catch (error) {
-        console.error('❌ Firebase leaderboard hatası:', error);
-    }
-}
 
 // Settings Modal Text Updates
 function updateSettingsModalTexts() {
