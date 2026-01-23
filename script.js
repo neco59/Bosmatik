@@ -854,11 +854,11 @@ class Bosmatik {
                 console.log('🔥 Firebase\'den leaderboard çekiliyor...');
                 console.log('Current user:', window.firebaseAuth.currentUser.displayName);
                 
+                // OrderBy yerine basit sorgu kullan (index sorunu yüzünden)
                 const leaderboardRef = window.firebaseDb.collection('leaderboard')
-                    .orderBy('score', 'desc')
-                    .limit(10);
+                    .limit(20); // Daha fazla veri çek, sonra client-side sırala
                 
-                console.log('📡 Firestore sorgusu gönderiliyor...');
+                console.log('📡 Firestore sorgusu gönderiliyor (orderBy olmadan)...');
                 const snapshot = await leaderboardRef.get();
                 console.log('📡 Firestore yanıtı alındı, döküman sayısı:', snapshot.size);
                 
@@ -876,6 +876,9 @@ class Bosmatik {
                     });
                 });
                 
+                // Client-side sıralama (Firebase index sorunu yüzünden)
+                firebaseLeaderboard.sort((a, b) => (b.score || 0) - (a.score || 0));
+                
                 // Eğer mevcut kullanıcı listede yoksa ekle
                 const currentUser = window.firebaseAuth.currentUser;
                 const userExists = firebaseLeaderboard.some(entry => entry.uid === currentUser.uid);
@@ -890,14 +893,17 @@ class Bosmatik {
                         isUser: true,
                         uid: currentUser.uid
                     });
+                    
+                    // Tekrar sırala
+                    firebaseLeaderboard.sort((a, b) => (b.score || 0) - (a.score || 0));
                 }
                 
-                // Skora göre tekrar sırala
-                firebaseLeaderboard.sort((a, b) => b.score - a.score);
+                // Sadece top 10'u al
+                const topLeaderboard = firebaseLeaderboard.slice(0, 10);
                 
-                console.log('✅ Firebase leaderboard yüklendi:', firebaseLeaderboard.length, 'kullanıcı');
-                console.log('📊 Final leaderboard:', firebaseLeaderboard);
-                return firebaseLeaderboard;
+                console.log('✅ Firebase leaderboard yüklendi:', topLeaderboard.length, 'kullanıcı');
+                console.log('📊 Final leaderboard:', topLeaderboard);
+                return topLeaderboard;
                 
             } else {
                 console.log('⚠️ Firebase bağlantısı yok veya kullanıcı giriş yapmamış');
@@ -2048,14 +2054,14 @@ async function updateFirebaseLeaderboard(score, activities) {
         const user = window.firebaseAuth.currentUser;
         
         const leaderboardData = {
-            uid: user.uid,
             displayName: user.displayName || 'Anonim Kullanıcı',
-            photoURL: user.photoURL || null,
-            score: score,
+            score: Number(score) || 0, // Sayı olduğundan emin ol
             timestamp: new Date(),
-            activities: activities,
-            lastUpdated: Date.now()
+            lastUpdated: Date.now(),
+            uid: user.uid
         };
+
+        console.log('💾 Firebase\'e kaydediliyor:', leaderboardData);
 
         // Update user's leaderboard entry (overwrite previous score)
         await window.firebaseDb.collection('leaderboard')
@@ -2063,6 +2069,13 @@ async function updateFirebaseLeaderboard(score, activities) {
             .set(leaderboardData);
 
         console.log('✅ Firebase leaderboard updated for user:', user.displayName, 'Score:', score);
+        
+        // Leaderboard'u yenile
+        if (window.bosmatikApp) {
+            setTimeout(() => {
+                window.bosmatikApp.initializeLeaderboard();
+            }, 1000);
+        }
         
     } catch (error) {
         console.error('❌ Firebase leaderboard update error:', error);
