@@ -367,18 +367,38 @@ function updateAuthUI(user) {
         const langEn = document.getElementById('lang-en');
         
         if (langTr) {
-            langTr.onclick = function() {
+            // Remove existing onclick
+            langTr.onclick = null;
+            
+            // Add event listener
+            langTr.addEventListener('click', function() {
                 console.log('🇹🇷 Turkish language selected');
-                changeLanguage('tr');
-            };
+                if (typeof window.changeLanguage === 'function') {
+                    window.changeLanguage('tr');
+                } else if (typeof changeLanguage === 'function') {
+                    changeLanguage('tr');
+                } else {
+                    console.error('changeLanguage function not found');
+                }
+            });
             console.log('✅ Turkish language button activated');
         }
         
         if (langEn) {
-            langEn.onclick = function() {
+            // Remove existing onclick
+            langEn.onclick = null;
+            
+            // Add event listener
+            langEn.addEventListener('click', function() {
                 console.log('🇺🇸 English language selected');
-                changeLanguage('en');
-            };
+                if (typeof window.changeLanguage === 'function') {
+                    window.changeLanguage('en');
+                } else if (typeof changeLanguage === 'function') {
+                    changeLanguage('en');
+                } else {
+                    console.error('changeLanguage function not found');
+                }
+            });
             console.log('✅ English language button activated');
         }
         
