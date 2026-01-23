@@ -478,13 +478,39 @@ class Bosmatik {
 
     getBoşLevel(score) {
         const levels = [
-            { min: 0, max: 2, name: t('levels.productive') || 'Üretken Karınca', emoji: '🐜', color: '#48bb78' },
-            { min: 2, max: 5, name: t('levels.lightWaster') || 'Hafif Boşçu', emoji: '😊', color: '#4299e1' },
-            { min: 5, max: 8, name: t('levels.mediumWaster') || 'Orta Seviye Boşçu', emoji: '😎', color: '#ed8936' },
-            { min: 8, max: 12, name: t('levels.advancedWaster') || 'İleri Seviye Boşçu', emoji: '🤪', color: '#9f7aea' },
-            { min: 12, max: 16, name: t('levels.master') || 'Boş Yapma Ustası', emoji: '🏆', color: '#f56565' },
-            { min: 16, max: 20, name: t('levels.legend') || 'Boş Yapma Efsanesi', emoji: '👑', color: '#d69e2e' },
-            { min: 20, max: Infinity, name: t('levels.god') || 'Boş Yapma Tanrısı', emoji: '🌟', color: '#805ad5' }
+            // Üretken Seviyeler (Negatif/Düşük Puanlar)
+            { min: -10, max: -5, name: t('levels.superProductive') || 'Süper Üretken', emoji: '�', color: '#22c55e' },
+            { min: -5, max: 0, name: t('levels.veryProductive') || 'Çok Üretken', emoji: '�', color: '#16a34a' },
+            { min: 0, max: 1, name: t('levels.productive') || 'Üretken Karınca', emoji: '🐜', color: '#48bb78' },
+            
+            // Hafif Boş Yapma Seviyeleri
+            { min: 1, max: 2.5, name: t('levels.lightWaster') || 'Hafif Boşçu', emoji: '😊', color: '#4299e1' },
+            { min: 2.5, max: 4, name: t('levels.casualWaster') || 'Gündelik Boşçu', emoji: '😌', color: '#3b82f6' },
+            { min: 4, max: 6, name: t('levels.regularWaster') || 'Normal Boşçu', emoji: '😎', color: '#6366f1' },
+            
+            // Orta Seviye Boş Yapma
+            { min: 6, max: 8, name: t('levels.mediumWaster') || 'Orta Seviye Boşçu', emoji: '🤔', color: '#ed8936' },
+            { min: 8, max: 10, name: t('levels.seriousWaster') || 'Ciddi Boşçu', emoji: '😅', color: '#f59e0b' },
+            { min: 10, max: 12, name: t('levels.advancedWaster') || 'İleri Seviye Boşçu', emoji: '🤪', color: '#9f7aea' },
+            
+            // Usta Seviyeler
+            { min: 12, max: 15, name: t('levels.master') || 'Boş Yapma Ustası', emoji: '🏆', color: '#f56565' },
+            { min: 15, max: 18, name: t('levels.expert') || 'Boş Yapma Uzmanı', emoji: '🎯', color: '#ef4444' },
+            { min: 18, max: 22, name: t('levels.legend') || 'Boş Yapma Efsanesi', emoji: '👑', color: '#d69e2e' },
+            
+            // Efsane Seviyeler
+            { min: 22, max: 26, name: t('levels.mythical') || 'Efsanevi Boşçu', emoji: '🔥', color: '#dc2626' },
+            { min: 26, max: 30, name: t('levels.legendary') || 'Boş Yapma Kralı', emoji: '👑', color: '#b91c1c' },
+            { min: 30, max: 35, name: t('levels.god') || 'Boş Yapma Tanrısı', emoji: '🌟', color: '#805ad5' },
+            
+            // Aşkın Seviyeler
+            { min: 35, max: 40, name: t('levels.transcendent') || 'Aşkın Boşçu', emoji: '✨', color: '#7c3aed' },
+            { min: 40, max: 50, name: t('levels.cosmic') || 'Kozmik Boşçu', emoji: '🌌', color: '#6d28d9' },
+            { min: 50, max: 75, name: t('levels.universal') || 'Evrensel Boşçu', emoji: '🪐', color: '#5b21b6' },
+            { min: 75, max: 100, name: t('levels.infinite') || 'Sonsuz Boşçu', emoji: '♾️', color: '#4c1d95' },
+            
+            // Nihai Seviye
+            { min: 100, max: Infinity, name: t('levels.ultimate') || 'Nihai Boş Yapma Varlığı', emoji: '🌠', color: '#1e1b4b' }
         ];
         
         return levels.find(level => score >= level.min && score < level.max) || levels[levels.length - 1];
