@@ -15,22 +15,7 @@ window.openSettings = function() {
 };
 
 window.toggleTheme = function() {
-    console.log('🌙 Early toggleTheme called');
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('bosmatik-theme', newTheme);
-    
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    }
-    
-    document.body.style.transition = 'all 0.3s ease';
-    setTimeout(() => {
-        document.body.style.transition = '';
-    }, 300);
+    console.log('🌙 Dark mode removed - function disabled');
 };
 
 window.openProfile = function() {
@@ -165,15 +150,15 @@ let app, auth, db;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM yüklendi, Firebase başlatılıyor...');
     
-    // Load theme immediately
-    const savedTheme = localStorage.getItem('bosmatik-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    // Load theme immediately - DISABLED (Dark mode removed)
+    // const savedTheme = localStorage.getItem('bosmatik-theme') || 'light';
+    // document.documentElement.setAttribute('data-theme', savedTheme);
     
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
-    console.log('🎨 Theme loaded:', savedTheme);
+    // const themeToggle = document.getElementById('themeToggle');
+    // if (themeToggle) {
+    //     themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    // }
+    console.log('🎨 Dark mode disabled - using light theme only');
     
     setTimeout(() => {
         initializeFirebase();
@@ -354,7 +339,6 @@ function updateAuthUI(user) {
         
         // Ensure buttons are visible and working after login
         const settingsBtn = document.getElementById('settingsBtn');
-        const themeToggle = document.getElementById('themeToggle');
         
         if (settingsBtn) {
             settingsBtn.style.display = 'block';
@@ -376,28 +360,6 @@ function updateAuthUI(user) {
                 }
             });
             console.log('✅ Settings button activated');
-        }
-        
-        if (themeToggle) {
-            themeToggle.style.display = 'block';
-            
-            // Remove existing onclick to avoid conflicts
-            themeToggle.onclick = null;
-            
-            // Add event listener
-            themeToggle.addEventListener('click', function() {
-                console.log('🌙 Theme toggle clicked from Firebase');
-                if (typeof window.toggleTheme === 'function') {
-                    window.toggleTheme();
-                } else {
-                    console.error('❌ toggleTheme function not found');
-                    // Try to find it in global scope
-                    if (typeof toggleTheme === 'function') {
-                        toggleTheme();
-                    }
-                }
-            });
-            console.log('✅ Theme toggle activated');
         }
         
         // Ensure language buttons work
@@ -443,7 +405,6 @@ function updateAuthUI(user) {
             // Test all critical functions
             console.log('🧪 Testing function availability:');
             console.log('- openSettings:', typeof window.openSettings);
-            console.log('- toggleTheme:', typeof window.toggleTheme);
             console.log('- openProfile:', typeof window.openProfile);
             console.log('- quickAdd:', typeof window.quickAdd);
             console.log('- manualReset:', typeof window.manualReset);
@@ -476,11 +437,10 @@ window.logout = logout;
 document.addEventListener('DOMContentLoaded', function() {
     // Wait for script.js to load
     setTimeout(() => {
-        // Settings and theme functions
+        // Settings functions
         if (typeof openSettings !== 'undefined') window.openSettings = openSettings;
         if (typeof closeSettings !== 'undefined') window.closeSettings = closeSettings;
-        if (typeof toggleTheme !== 'undefined') window.toggleTheme = toggleTheme;
-        if (typeof loadTheme !== 'undefined') window.loadTheme = loadTheme;
+        // Dark mode removed - no longer needed
         
         // Profile functions
         if (typeof openProfile !== 'undefined') window.openProfile = openProfile;
@@ -488,8 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof saveProfile !== 'undefined') window.saveProfile = saveProfile;
         if (typeof selectAvatar !== 'undefined') window.selectAvatar = selectAvatar;
         
-        // Notification functions
-        if (typeof testNotification !== 'undefined') window.testNotification = testNotification;
+        // Notification functions - Test notification removed for simplicity
         if (typeof toggleNotifications !== 'undefined') window.toggleNotifications = toggleNotifications;
         if (typeof updateNotificationTime !== 'undefined') window.updateNotificationTime = updateNotificationTime;
         if (typeof updateAchievementNotifications !== 'undefined') window.updateAchievementNotifications = updateAchievementNotifications;
@@ -504,11 +463,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof closeAchievement !== 'undefined') window.closeAchievement = closeAchievement;
         if (typeof changeLanguage !== 'undefined') window.changeLanguage = changeLanguage;
         
-        // Initialize theme
-        if (typeof loadTheme !== 'undefined') {
-            loadTheme();
-        }
+        // Dark mode removed - theme initialization no longer needed
         
-        console.log('🌐 All functions made globally available');
+        console.log('🌐 All functions made globally available (Dark mode removed)');
     }, 2000);
 });
