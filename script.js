@@ -1289,37 +1289,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ensureLanguageButtonsWork();
     }, 100);
 });
-// Dark Mode Functionality
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('bosmatik-theme', newTheme);
-    
-    // Update theme toggle button
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    }
-    
-    // Add smooth transition effect
-    document.body.style.transition = 'all 0.3s ease';
-    setTimeout(() => {
-        document.body.style.transition = '';
-    }, 300);
-}
+// Dark Mode Functionality - REMOVED
+// function toggleTheme() { ... }
+// function loadTheme() { ... }
 
-// Load saved theme
-function loadTheme() {
-    const savedTheme = localStorage.getItem('bosmatik-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
-}
+// Dark mode completely removed for simplicity
 
 // Initialize theme on page load - handled by firebase-config.js
 // document.addEventListener('DOMContentLoaded', () => {
@@ -1343,7 +1317,7 @@ function addModernAnimations() {
     });
     
     // Add ripple effect to buttons
-    const buttons = document.querySelectorAll('.quick-add, .calculate-btn, .lang-btn, .theme-toggle');
+    const buttons = document.querySelectorAll('.quick-add, .calculate-btn, .lang-btn');
     buttons.forEach(button => {
         button.addEventListener('click', createRipple);
     });
@@ -1560,102 +1534,8 @@ class NotificationManager {
         }
     }
     
-    testNotification() {
-        console.log('🔔 Test bildirimi başlatılıyor...');
-        
-        const title = t('testNotificationTitle') || '🔔 Test Bildirimi';
-        const body = t('testNotificationBody') || 'Bildirimler düzgün çalışıyor! 🎉';
-        
-        // First check if notifications are supported
-        if (!('Notification' in window)) {
-            console.error('Bildirimler desteklenmiyor');
-            alert(t('notificationNotSupported') || 'Bu tarayıcı bildirimleri desteklemiyor.');
-            return;
-        }
-        
-        console.log('Bildirim izni durumu:', Notification.permission);
-        
-        // Check permission and request if needed
-        if (Notification.permission === 'default') {
-            console.log('İzin isteniyor...');
-            Notification.requestPermission().then(permission => {
-                console.log('İzin sonucu:', permission);
-                if (permission === 'granted') {
-                    this.sendTestNotification(title, body);
-                } else {
-                    alert(t('notificationDenied') || 'Bildirimler engellenmiş. Tarayıcı ayarlarından etkinleştirin.');
-                }
-            }).catch(error => {
-                console.error('İzin isteme hatası:', error);
-                alert('Bildirim izni alınırken hata oluştu: ' + error.message);
-            });
-        } else if (Notification.permission === 'granted') {
-            console.log('İzin zaten verilmiş, bildirim gönderiliyor...');
-            this.sendTestNotification(title, body);
-        } else {
-            console.error('Bildirim izni reddedilmiş');
-            alert(t('notificationDenied') || 'Bildirimler engellenmiş. Tarayıcı ayarlarından etkinleştirin.');
-        }
-    }
-    
-    sendTestNotification(title, body) {
-        console.log('Test bildirimi gönderiliyor:', title, body);
-        
-        try {
-            // Önce basit Notification API'yi dene (daha güvenilir)
-            const notification = new Notification(title, {
-                body: body,
-                icon: './icon-192.png',
-                tag: 'test',
-                requireInteraction: false
-            });
-            
-            console.log('✅ Test bildirimi başarıyla oluşturuldu');
-            this.showSuccessMessage(t('testNotificationSent') || '🔔 Test bildirimi gönderildi!');
-            
-            // Bildirim tıklandığında
-            notification.onclick = function() {
-                console.log('Test bildirimi tıklandı');
-                window.focus();
-                notification.close();
-            };
-            
-            // 5 saniye sonra otomatik kapat
-            setTimeout(() => {
-                notification.close();
-                console.log('Test bildirimi otomatik kapatıldı');
-            }, 5000);
-            
-        } catch (error) {
-            console.error('Basit bildirim hatası:', error);
-            
-            // Service Worker ile dene
-            if ('serviceWorker' in navigator) {
-                console.log('Service Worker ile deneniyor...');
-                navigator.serviceWorker.ready.then(registration => {
-                    return registration.showNotification(title, {
-                        body: body,
-                        icon: './icon-192.png',
-                        badge: './icon-192.png',
-                        tag: 'test',
-                        requireInteraction: false,
-                        vibrate: [200, 100, 200]
-                    });
-                }).then(() => {
-                    console.log('✅ Service Worker bildirimi başarılı');
-                    this.showSuccessMessage(t('testNotificationSent') || '🔔 Test bildirimi gönderildi!');
-                }).catch(swError => {
-                    console.error('Service Worker bildirim hatası:', swError);
-                    // Yine de başarı mesajı göster çünkü izin verilmiş
-                    this.showSuccessMessage('Bildirim gönderildi (hata olabilir: ' + swError.message + ')');
-                });
-            } else {
-                console.error('Service Worker desteklenmiyor');
-                // Yine de başarı mesajı göster
-                this.showSuccessMessage('Bildirim API\'si çalışıyor (görsel bildirim gösterilmeyebilir)');
-            }
-        }
-    }
+    // testNotification() method REMOVED - Simplified settings
+    // sendTestNotification() method REMOVED - Simplified settings
     
     clearScheduledNotifications() {
         // Mevcut timeout'ları temizle (basit implementasyon)
@@ -2046,11 +1926,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
 });
 
-// Test notification function
-function testNotification() {
-    if (!notificationManager) return;
-    notificationManager.testNotification();
-}
+// Test notification function - REMOVED (Simplified settings)
+// function testNotification() { ... }
 // Initialize notification manager
 document.addEventListener('DOMContentLoaded', () => {
     notificationManager = new NotificationManager();
@@ -2124,15 +2001,14 @@ window.selectAvatar = selectAvatar;
 window.saveProfile = saveProfile;
 window.openSettings = openSettings;
 window.closeSettings = closeSettings;
-window.toggleTheme = toggleTheme;
-window.testNotification = testNotification;
+// window.testNotification = testNotification; // REMOVED - Simplified settings
 window.updateFirebaseLeaderboard = updateFirebaseLeaderboard;
 
 // Debug: Log function availability
 console.log('🔧 Global functions registered:', {
     openProfile: typeof window.openProfile,
-    openSettings: typeof window.openSettings,
-    toggleTheme: typeof window.toggleTheme
+    openSettings: typeof window.openSettings
+    // toggleTheme: typeof window.toggleTheme // REMOVED
 });
 
 // Ensure functions are available immediately
@@ -2140,13 +2016,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Double-check function availability after DOM load
     console.log('📋 DOM loaded, function check:', {
         openProfile: typeof window.openProfile,
-        openSettings: typeof window.openSettings,
-        toggleTheme: typeof window.toggleTheme
+        openSettings: typeof window.openSettings
+        // toggleTheme: typeof window.toggleTheme // REMOVED
     });
     
     // Manually attach event listeners as backup
     const settingsBtn = document.getElementById('settingsBtn');
-    const themeToggle = document.getElementById('themeToggle');
     
     if (settingsBtn && !settingsBtn.onclick) {
         settingsBtn.addEventListener('click', function() {
@@ -2154,14 +2029,6 @@ document.addEventListener('DOMContentLoaded', function() {
             openSettings();
         });
         console.log('✅ Settings button event listener attached');
-    }
-    
-    if (themeToggle && !themeToggle.onclick) {
-        themeToggle.addEventListener('click', function() {
-            console.log('🌙 Theme toggle clicked via event listener');
-            toggleTheme();
-        });
-        console.log('✅ Theme toggle event listener attached');
     }
 });
 
