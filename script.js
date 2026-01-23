@@ -3,6 +3,10 @@ class Bosmatik {
         this.userData = this.loadUserData();
         this.achievements = this.initializeAchievements();
         this.leaderboardData = []; // Başlangıçta boş, async yüklenecek
+        
+        // Eski sahte leaderboard verilerini temizle
+        this.clearOldLeaderboardData();
+        
         this.initializeEventListeners();
         this.updateUserStats();
         this.generateDailyTip();
@@ -11,31 +15,74 @@ class Bosmatik {
         this.initializeLeaderboard();
     }
     
+    clearOldLeaderboardData() {
+        // Eski sahte leaderboard verilerini localStorage'dan sil
+        localStorage.removeItem('bosmatik-leaderboard');
+        
+        // Tüm leaderboard ile ilgili cache'i temizle
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.includes('leaderboard')) {
+                keysToRemove.push(key);
+            }
+        }
+        
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+            console.log('🗑️ Temizlendi:', key);
+        });
+        
+        console.log('🗑️ Eski leaderboard verileri tamamen temizlendi');
+        
+        // Sayfayı yenileme uyarısı (sadece bir kez)
+        if (!sessionStorage.getItem('leaderboard-cleared')) {
+            sessionStorage.setItem('leaderboard-cleared', 'true');
+            console.log('⚠️ İlk temizlik yapıldı. Eğer sorun devam ederse sayfayı yenileyin.');
+        }
+    }
+    
     async initializeLeaderboard() {
         try {
+            console.log('🚀 Leaderboard başlatılıyor...');
+            
             // İlk olarak boş leaderboard göster
             this.leaderboardData = [];
             this.displayLeaderboard();
             
             // Firebase hazır olana kadar bekle
             let attempts = 0;
-            const maxAttempts = 10;
+            const maxAttempts = 15; // Daha fazla deneme
             
             const waitForFirebase = async () => {
                 attempts++;
                 console.log(`🔥 Firebase bekleniyor... Deneme ${attempts}/${maxAttempts}`);
+                console.log('Firebase durumu:', {
+                    firebaseDb: !!window.firebaseDb,
+                    firebaseAuth: !!window.firebaseAuth,
+                    currentUser: !!window.firebaseAuth?.currentUser,
+                    userUid: window.firebaseAuth?.currentUser?.uid
+                });
                 
                 if (window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser) {
                     console.log('✅ Firebase hazır, leaderboard yükleniyor...');
-                    this.leaderboardData = await this.loadLeaderboard();
-                    this.displayLeaderboard();
-                    return true;
+                    try {
+                        this.leaderboardData = await this.loadLeaderboard();
+                        console.log('📊 Yüklenen leaderboard:', this.leaderboardData);
+                        this.displayLeaderboard();
+                        return true;
+                    } catch (error) {
+                        console.error('❌ Leaderboard yükleme hatası:', error);
+                        return false;
+                    }
                 } else if (attempts < maxAttempts) {
-                    // 2 saniye bekle ve tekrar dene
-                    setTimeout(waitForFirebase, 2000);
+                    // 1.5 saniye bekle ve tekrar dene
+                    setTimeout(waitForFirebase, 1500);
                     return false;
                 } else {
                     console.log('⚠️ Firebase bağlantısı kurulamadı, boş leaderboard gösteriliyor');
+                    this.leaderboardData = [];
+                    this.displayLeaderboard();
                     return false;
                 }
             };
@@ -44,6 +91,8 @@ class Bosmatik {
             
         } catch (error) {
             console.error('❌ Leaderboard başlatma hatası:', error);
+            this.leaderboardData = [];
+            this.displayLeaderboard();
         }
     }
 
@@ -803,16 +852,21 @@ class Bosmatik {
             // Firebase'den gerçek leaderboard verilerini çek
             if (window.firebaseDb && window.firebaseAuth && window.firebaseAuth.currentUser) {
                 console.log('🔥 Firebase\'den leaderboard çekiliyor...');
+                console.log('Current user:', window.firebaseAuth.currentUser.displayName);
                 
                 const leaderboardRef = window.firebaseDb.collection('leaderboard')
                     .orderBy('score', 'desc')
                     .limit(10);
                 
+                console.log('📡 Firestore sorgusu gönderiliyor...');
                 const snapshot = await leaderboardRef.get();
+                console.log('📡 Firestore yanıtı alındı, döküman sayısı:', snapshot.size);
+                
                 const firebaseLeaderboard = [];
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    console.log('📄 Döküman:', doc.id, data);
                     firebaseLeaderboard.push({
                         name: data.displayName || 'Anonim Kullanıcı',
                         score: data.score || 0,
@@ -826,7 +880,10 @@ class Bosmatik {
                 const currentUser = window.firebaseAuth.currentUser;
                 const userExists = firebaseLeaderboard.some(entry => entry.uid === currentUser.uid);
                 
+                console.log('👤 Kullanıcı listede var mı?', userExists);
+                
                 if (!userExists) {
+                    console.log('➕ Mevcut kullanıcı listeye ekleniyor...');
                     firebaseLeaderboard.push({
                         name: currentUser.displayName || 'Sen',
                         score: 0,
@@ -839,10 +896,16 @@ class Bosmatik {
                 firebaseLeaderboard.sort((a, b) => b.score - a.score);
                 
                 console.log('✅ Firebase leaderboard yüklendi:', firebaseLeaderboard.length, 'kullanıcı');
+                console.log('📊 Final leaderboard:', firebaseLeaderboard);
                 return firebaseLeaderboard;
                 
             } else {
                 console.log('⚠️ Firebase bağlantısı yok veya kullanıcı giriş yapmamış');
+                console.log('Firebase durumu:', {
+                    db: !!window.firebaseDb,
+                    auth: !!window.firebaseAuth,
+                    user: !!window.firebaseAuth?.currentUser
+                });
                 // Firebase yoksa boş array döndür
                 return [];
             }
