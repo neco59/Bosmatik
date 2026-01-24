@@ -98,15 +98,19 @@ const translations = {
             yearly: "🌟 Yıllık"
         },
         
-        // Levels
+        // Levels - Tam Liste
         levels: {
-            productive: "Üretken Karınca",
-            lightWaster: "Hafif Boşçu",
-            mediumWaster: "Orta Seviye Boşçu",
-            advancedWaster: "İleri Seviye Boşçu",
-            master: "Boş Yapma Ustası",
-            legend: "Boş Yapma Efsanesi",
-            god: "Boş Yapma Tanrısı"
+            superProductive: "🚀 Süper Üretken",
+            productive: "🐜 Üretken Karınca", 
+            lightWaster: "😊 Hafif Boşçu",
+            mediumWaster: "😅 Orta Seviye Boşçu",
+            wasteCandidate: "😴 Boş Yapma Adayı",
+            wasteMaster: "🎮 Boş Yapma Ustası",
+            wasteChampion: "🏆 Boş Yapma Şampiyonu",
+            wasteKing: "👑 Boş Yapma Kralı",
+            wasteGod: "🌟 Boş Yapma Tanrısı",
+            ultimateWaster: "🌠 Nihai Boş Yapma Varlığı",
+            casualWaster: "😴 Boş Yapma Adayı"
         },
         
         // Messages
@@ -274,15 +278,19 @@ const translations = {
             yearly: "🌟 Yearly"
         },
         
-        // Levels
+        // Levels - Complete List
         levels: {
-            productive: "Productive Ant",
-            lightWaster: "Light Waster",
-            mediumWaster: "Medium Waster",
-            advancedWaster: "Advanced Waster",
-            master: "Time-Wasting Master",
-            legend: "Time-Wasting Legend",
-            god: "Time-Wasting God"
+            superProductive: "🚀 Super Productive",
+            productive: "🐜 Productive Ant",
+            lightWaster: "😊 Light Waster",
+            mediumWaster: "😅 Medium Waster",
+            wasteCandidate: "😴 Waste Candidate",
+            wasteMaster: "🎮 Time-Wasting Master",
+            wasteChampion: "🏆 Time-Wasting Champion",
+            wasteKing: "👑 Time-Wasting King",
+            wasteGod: "🌟 Time-Wasting God",
+            ultimateWaster: "🌠 Ultimate Wasting Being",
+            casualWaster: "😴 Casual Waster"
         },
         
         // Messages
@@ -370,8 +378,15 @@ function t(key) {
 
 // Dil değiştirme fonksiyonu
 function changeLanguage(lang) {
+    const oldLanguage = currentLanguage;
     currentLanguage = lang;
     localStorage.setItem('bosmatik-language', lang);
+    
+    // Analytics tracking
+    if (typeof trackLanguageChange === 'function') {
+        trackLanguageChange(lang, oldLanguage);
+    }
+    
     updatePageTexts();
     
     // Update settings modal if it's open
